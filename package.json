@@ -65,5 +65,11 @@
     "*": [
       "eslint --fix --quiet"
     ]
+  },
+  "unbuild": {
+    "declaration": true,
+    "exports": "named",
+    "preserveModules": true,
+    "sourcemap": true
   }
 }
