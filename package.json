@@ -1,0 +1,69 @@
+{
+  "name": "@nivalis/iban",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "A simple library to validate IBAN numbers",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/nivalis-studio/iban#readme",
+  "repository": {
+    "url": "git+https://github.com/nivalis-studio/iban.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nivalis-studio/iban/issues"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "test": "exit 0",
+    "build": "unbuild",
+    "prepublishOnly": "unbuild",
+    "ts": "tsc",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "simple-git-hooks"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@nivalis/eslint-config": "^3.2.0",
+    "@nivalis/prettier-config": "^3.3.3",
+    "@types/bun": "latest",
+    "eslint": "^9.8.0",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.3",
+    "simple-git-hooks": "^2.11.1",
+    "unbuild": "^2.0.0"
+  },
+  "prettier": "@nivalis/prettier-config",
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*": [
+      "eslint --fix --quiet"
+    ]
+  }
+}
