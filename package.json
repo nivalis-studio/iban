@@ -25,7 +25,9 @@
 		"prepare": "lefthook install",
 		"ts": "tsc --noEmit --incremental"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"taze": "19.10.0"
+	},
 	"peerDependencies": {
 		"typescript": "^5"
 	},
