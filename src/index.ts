@@ -131,8 +131,13 @@ export const toBBAN = (iban: string, separator = ' '): string => {
   }
 
   const ibanFormatted = electronicFormat(iban);
+  const countryStructure = getCountry(ibanFormatted.slice(0, 2));
 
-  return getCountry(ibanFormatted.slice(0, 2)).toBBAN(ibanFormatted, separator);
+  if (!countryStructure.isValid(ibanFormatted)) {
+    throw new Error('Invalid IBAN');
+  }
+
+  return countryStructure.toBBAN(ibanFormatted, separator);
 };
 
 /**

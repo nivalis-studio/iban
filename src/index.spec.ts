@@ -222,6 +222,10 @@ describe('IBAN', () => {
       // @ts-expect-error test the case of an invalid param type
       expect(() => toBBAN(123)).toThrow('IBAN must be a string');
     });
+
+    it('should throw an error for an IBAN with invalid check digits', () => {
+      expect(() => toBBAN('BE99539007547034')).toThrow('Invalid IBAN');
+    });
   });
 
   describe('.fromBBAN', () => {
