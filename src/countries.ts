@@ -11,6 +11,13 @@ const COUNTRY_DEFINITIONS = {
   'BG': new Specification('BG', 22, 'U04F04F02A08', 'BG80BNBG96611020345678'),
   'BH': new Specification('BH', 22, 'U04A14', 'BH67BMAG00001299123456'),
 
+  'BI': new Specification(
+    'BI',
+    27,
+    'F05F05F11F02',
+    'BI4210000100010000332045181',
+  ),
+
   'BR': new Specification(
     'BR',
     29,
@@ -36,6 +43,14 @@ const COUNTRY_DEFINITIONS = {
 
   'CZ': new Specification('CZ', 24, 'F04F06F10', 'CZ6508000000192000145399'),
   'DE': new Specification('DE', 22, 'F08F10', 'DE89370400440532013000'),
+
+  'DJ': new Specification(
+    'DJ',
+    27,
+    'F05F05F11F02',
+    'DJ2100010000000154000100186',
+  ),
+
   'DK': new Specification('DK', 18, 'F04F09F01', 'DK5000400440116243'),
   'DO': new Specification('DO', 28, 'U04F20', 'DO28BAGR00000001212453611324'),
   'EE': new Specification('EE', 20, 'F02F02F11F01', 'EE382200221020145685'),
@@ -55,6 +70,7 @@ const COUNTRY_DEFINITIONS = {
   ),
 
   'FI': new Specification('FI', 18, 'F06F07F01', 'FI2112345600000785'),
+  'FK': new Specification('FK', 18, 'U02F12', 'FK88SC123456789012'),
   'FO': new Specification('FO', 18, 'F04F09F01', 'FO6264600001631634'),
 
   'FR': new Specification(
@@ -72,6 +88,7 @@ const COUNTRY_DEFINITIONS = {
   'GR': new Specification('GR', 27, 'F03F04A16', 'GR1601101250000000012300695'),
 
   'GT': new Specification('GT', 28, 'A04A20', 'GT82TRAJ01020000001210029690'),
+  'HN': new Specification('HN', 28, 'U04F20', 'HN88CABF00000000000250005469'),
   'HR': new Specification('HR', 21, 'F07F10', 'HR1210010051863000160'),
 
   'HU': new Specification(
@@ -117,6 +134,7 @@ const COUNTRY_DEFINITIONS = {
   'LI': new Specification('LI', 21, 'F05A12', 'LI21088100002324013AA'),
   'LT': new Specification('LT', 20, 'F05F11', 'LT121000011101001000'),
   'LU': new Specification('LU', 20, 'F03A13', 'LU280019400644750000'),
+  'LY': new Specification('LY', 25, 'F03F03F15', 'LY83002048000020100120361'),
 
   'MC': new Specification(
     'MC',
@@ -128,6 +146,7 @@ const COUNTRY_DEFINITIONS = {
   'MD': new Specification('MD', 24, 'U02A18', 'MD24AG000225100013104168'),
   'ME': new Specification('ME', 22, 'F03F13F02', 'ME25505000012345678951'),
   'MK': new Specification('MK', 19, 'F03A10F02', 'MK07250120000058984'),
+  'MN': new Specification('MN', 20, 'F04F12', 'MN121234123456789123'),
 
   'MR': new Specification(
     'MR',
@@ -150,8 +169,10 @@ const COUNTRY_DEFINITIONS = {
     'MU17BOMM0101101030300200000MUR',
   ),
 
+  'NI': new Specification('NI', 28, 'U04F20', 'NI45BAPR00000013000003558124'),
   'NL': new Specification('NL', 18, 'U04F10', 'NL91ABNA0417164300'),
   'NO': new Specification('NO', 15, 'F04F06F01', 'NO9386011117947'),
+  'OM': new Specification('OM', 23, 'F03A16', 'OM810180000001299123456'),
   'PK': new Specification('PK', 24, 'U04A16', 'PK36SCBL0000001123456702'),
   'PL': new Specification('PL', 28, 'F08F16', 'PL61109010140000071219812874'),
 
@@ -168,6 +189,14 @@ const COUNTRY_DEFINITIONS = {
 
   'RO': new Specification('RO', 24, 'U04A16', 'RO49AAAA1B31007593840000'),
   'RS': new Specification('RS', 22, 'F03F13F02', 'RS35260005601001611379'),
+
+  'RU': new Specification(
+    'RU',
+    33,
+    'F09F05A15',
+    'RU0304452522540817810538091310419',
+  ),
+
   'SA': new Specification('SA', 24, 'F02A18', 'SA0380000000608010167519'),
 
   'SC': new Specification(
@@ -177,6 +206,7 @@ const COUNTRY_DEFINITIONS = {
     'SC18SSCB11010000000000001497USD',
   ),
 
+  'SD': new Specification('SD', 18, 'F02F12', 'SD2129010501234001'),
   'SE': new Specification('SE', 24, 'F03F16F01', 'SE4550000000058398257466'),
   'SI': new Specification('SI', 19, 'F05F08F02', 'SI56263300012039086'),
   'SK': new Specification('SK', 24, 'F04F06F10', 'SK3112000000198742637541'),
@@ -188,6 +218,7 @@ const COUNTRY_DEFINITIONS = {
     'SM86U0322509800000000270100',
   ),
 
+  'SO': new Specification('SO', 23, 'F04F03F12', 'SO211000001001000100141'),
   'ST': new Specification('ST', 25, 'F08F11F02', 'ST68000100010051845310112'),
   'SV': new Specification('SV', 28, 'U04F20', 'SV62CENR00000000000000700025'),
   'TL': new Specification('TL', 23, 'F03F14F02', 'TL380080012345678910157'),
@@ -201,14 +232,19 @@ const COUNTRY_DEFINITIONS = {
   'VG': new Specification('VG', 24, 'U04F16', 'VG96VPVG0000012345678901'),
   'XK': new Specification('XK', 20, 'F04F10F02', 'XK051212012345678906'),
 
+  'YE': new Specification(
+    'YE',
+    30,
+    'U04F04A18',
+    'YE15CBYE0001018861234567891234',
+  ),
+
   // The following countries are not included in the official IBAN registry but use the IBAN specification
 
   // Angola
   'AO': new Specification('AO', 25, 'F21', 'AO69123456789012345678901'),
   // Burkina
   'BF': new Specification('BF', 27, 'F23', 'BF2312345678901234567890123'),
-  // Burundi
-  'BI': new Specification('BI', 16, 'F12', 'BI41123456789012'),
   // Benin
   'BJ': new Specification('BJ', 28, 'F24', 'BJ39123456789012345678901234'),
   // Ivory

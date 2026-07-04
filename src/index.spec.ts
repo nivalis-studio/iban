@@ -101,6 +101,14 @@ describe('IBAN', () => {
     it('should return true for a valid Egypt IBAN', () => {
       expect(isValid('EG800002000156789012345180002')).toBe(true);
     });
+
+    it('should return true for a valid Burundian IBAN', () => {
+      expect(isValid('BI4210000100010000332045181')).toBe(true);
+    });
+
+    it('should return false for the old 16-character Burundian format', () => {
+      expect(isValid('BI41123456789012')).toBe(false);
+    });
   });
 
   describe('.describe', () => {
