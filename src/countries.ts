@@ -1,5 +1,9 @@
 import { Specification } from './specification';
 
+/* France and its territories share the same IBAN structure, only the country code varies */
+const frenchSpec = (countryCode: string, example: string) =>
+  new Specification(countryCode, 27, 'F05F05A11F02', example);
+
 const COUNTRY_DEFINITIONS = {
   'AD': new Specification('AD', 24, 'F04F04A12', 'AD1200012030200359100100'),
   'AE': new Specification('AE', 23, 'F03F16', 'AE070331234567890123456'),
@@ -57,13 +61,7 @@ const COUNTRY_DEFINITIONS = {
   'FI': new Specification('FI', 18, 'F06F07F01', 'FI2112345600000785'),
   'FO': new Specification('FO', 18, 'F04F09F01', 'FO6264600001631634'),
 
-  'FR': new Specification(
-    'FR',
-    27,
-    'F05F05A11F02',
-    'FR1420041010050500013M02606',
-  ),
-
+  'FR': frenchSpec('FR', 'FR1420041010050500013M02606'),
   'GB': new Specification('GB', 22, 'U04F06F08', 'GB29NWBK60161331926819'),
   'GE': new Specification('GE', 22, 'U02F16', 'GE29NB0000000101904917'),
   'GI': new Specification('GI', 23, 'U04A15', 'GI75NWBK000000007099453'),
@@ -232,89 +230,18 @@ const COUNTRY_DEFINITIONS = {
 
   // The following are regional and administrative French Republic subdivision IBAN specification (same structure as FR, only country code vary)
 
-  'GF': new Specification(
-    'GF',
-    27,
-    'F05F05A11F02',
-    'GF121234512345123456789AB13',
-  ),
-
-  'GP': new Specification(
-    'GP',
-    27,
-    'F05F05A11F02',
-    'GP791234512345123456789AB13',
-  ),
-
-  'MQ': new Specification(
-    'MQ',
-    27,
-    'F05F05A11F02',
-    'MQ221234512345123456789AB13',
-  ),
-
-  'RE': new Specification(
-    'RE',
-    27,
-    'F05F05A11F02',
-    'RE131234512345123456789AB13',
-  ),
-
-  'PF': new Specification(
-    'PF',
-    27,
-    'F05F05A11F02',
-    'PF281234512345123456789AB13',
-  ),
-
-  'TF': new Specification(
-    'TF',
-    27,
-    'F05F05A11F02',
-    'TF891234512345123456789AB13',
-  ),
-
-  'YT': new Specification(
-    'YT',
-    27,
-    'F05F05A11F02',
-    'YT021234512345123456789AB13',
-  ),
-
-  'NC': new Specification(
-    'NC',
-    27,
-    'F05F05A11F02',
-    'NC551234512345123456789AB13',
-  ),
-
-  'BL': new Specification(
-    'BL',
-    27,
-    'F05F05A11F02',
-    'BL391234512345123456789AB13',
-  ),
-
-  'MF': new Specification(
-    'MF',
-    27,
-    'F05F05A11F02',
-    'MF551234512345123456789AB13',
-  ),
-
-  'PM': new Specification(
-    'PM',
-    27,
-    'F05F05A11F02',
-    'PM071234512345123456789AB13',
-  ),
-
-  'WF': new Specification(
-    'WF',
-    27,
-    'F05F05A11F02',
-    'WF621234512345123456789AB13',
-  ),
+  'GF': frenchSpec('GF', 'GF121234512345123456789AB13'),
+  'GP': frenchSpec('GP', 'GP791234512345123456789AB13'),
+  'MQ': frenchSpec('MQ', 'MQ221234512345123456789AB13'),
+  'RE': frenchSpec('RE', 'RE131234512345123456789AB13'),
+  'PF': frenchSpec('PF', 'PF281234512345123456789AB13'),
+  'TF': frenchSpec('TF', 'TF891234512345123456789AB13'),
+  'YT': frenchSpec('YT', 'YT021234512345123456789AB13'),
+  'NC': frenchSpec('NC', 'NC551234512345123456789AB13'),
+  'BL': frenchSpec('BL', 'BL391234512345123456789AB13'),
+  'MF': frenchSpec('MF', 'MF551234512345123456789AB13'),
+  'PM': frenchSpec('PM', 'PM071234512345123456789AB13'),
+  'WF': frenchSpec('WF', 'WF621234512345123456789AB13'),
 } as const satisfies Record<string, Specification>;
 
 export const COUNTRIES: Record<string, Specification> = COUNTRY_DEFINITIONS;
