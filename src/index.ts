@@ -18,10 +18,9 @@ const IMMUTABLE_COUNTRIES: Readonly<Record<CountryCode, Specification>> =
     ) as Record<CountryCode, Specification>,
   );
 
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function getCountry(countryCode: CountryCode): Specification;
-export function getCountry(countryCode: string): Specification;
-export function getCountry(countryCode: string): Specification {
+export function getCountry(
+  countryCode: CountryCode | (string & {}),
+): Specification {
   const normalizedCountryCode = countryCode.toUpperCase().trim();
   const countryStructure = COUNTRIES[normalizedCountryCode];
 
@@ -143,10 +142,10 @@ export const toBBAN = (iban: string, separator = ' '): string => {
  * @param {string} bban the BBAN to convert to IBAN
  * @returns {string} the IBAN
  */
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function fromBBAN(countryCode: CountryCode, bban: string): string;
-export function fromBBAN(countryCode: string, bban: string): string;
-export function fromBBAN(countryCode: string, bban: string): string {
+export function fromBBAN(
+  countryCode: CountryCode | (string & {}),
+  bban: string,
+): string {
   if (!isString(countryCode)) {
     throw new Error('Country code must be a string');
   }
@@ -164,10 +163,10 @@ export function fromBBAN(countryCode: string, bban: string): string {
  * @param {string} bban the BBAN to check the validity of
  * @returns {boolean} true if the passed BBAN is valid, false otherwise
  */
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function isValidBBAN(countryCode: CountryCode, bban: string): boolean;
-export function isValidBBAN(countryCode: string, bban: string): boolean;
-export function isValidBBAN(countryCode: string, bban: string): boolean {
+export function isValidBBAN(
+  countryCode: CountryCode | (string & {}),
+  bban: string,
+): boolean {
   if (!(isString(countryCode) && isString(bban))) {
     return false;
   }
