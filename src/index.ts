@@ -41,6 +41,14 @@ export type ValidationResult =
   | { ok: true }
   | { ok: false; error: ValidationError };
 
+/**
+ * Convert an IBAN to its electronic format.
+ * Note: every non-alphanumeric character (spaces, dashes, punctuation,
+ * unicode symbols, ...) is stripped and the result is uppercased before
+ * any processing.
+ * @param {string} iban the IBAN to format
+ * @returns {string} the IBAN in uppercase, alphanumeric-only electronic format
+ */
 export const electronicFormat = (iban: string): string => {
   if (!isString(iban)) {
     throw new Error('IBAN must be a string');
@@ -51,6 +59,8 @@ export const electronicFormat = (iban: string): string => {
 
 /**
  * Validate an IBAN without throwing, returning structured error information.
+ * Note: non-alphanumeric characters are stripped from the input before
+ * validation, so no error is ever reported for stripped characters.
  * @param {string} iban the IBAN to validate
  * @returns {ValidationResult} the validation status and optional error code
  */
@@ -84,6 +94,8 @@ export const validate = (iban: string): ValidationResult => {
 
 /**
  * Check if an IBAN is valid. Does not throw an error if the IBAN is invalid.
+ * Note: non-alphanumeric characters are stripped from the input before
+ * validation, so print-formatted IBANs (e.g. 'BE68 5390 0754 7034') are valid.
  * @param {string} iban the IBAN to validate.
  * @returns {boolean} true if the passed IBAN is valid, false otherwise
  */
