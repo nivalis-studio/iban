@@ -175,7 +175,9 @@ console.log(countries['BE'].example); // 'BE68539007547034'
 
 ## Input Sanitization
 
-All functions strip every non-alphanumeric character (anything outside `A-Z`, `a-z`, `0-9`) from their input and convert it to uppercase **before** any validation, formatting, or conversion takes place. This applies to spaces, dashes, punctuation, symbols, and unicode characters alike.
+Every IBAN or BBAN string passed to the library is stripped of all non-alphanumeric characters (anything outside `A-Z`, `a-z`, `0-9`) and converted to uppercase **before** any validation, formatting, or conversion takes place. This applies to spaces, dashes, punctuation, symbols, and unicode characters alike.
+
+Country-code arguments (the first parameter of `fromBBAN` and `isValidBBAN`) are the exception: they are only trimmed and uppercased, never stripped — `fromBBAN('B-E', ...)` throws instead of being sanitized to `'BE'`.
 
 This lenient behavior is intentional and matches the legacy [iban.js](https://github.com/arhs/iban.js) library: IBANs copied from print-formatted documents, bank statements, or web pages often contain separators or stray characters, and they should still validate.
 
