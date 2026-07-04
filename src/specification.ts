@@ -1,6 +1,16 @@
 import { A_CODE_POINT_AT } from './utils';
 
-export type StructurePattern = 'A' | 'B' | 'C' | 'F' | 'L' | 'U' | 'W';
+const PATTERN_FORMATS = {
+  A: '0-9A-Za-z',
+  B: '0-9A-Z',
+  C: 'A-Za-z',
+  F: '0-9',
+  L: 'a-z',
+  U: 'A-Z',
+  W: '0-9a-z',
+};
+
+export type StructurePattern = keyof typeof PATTERN_FORMATS;
 
 export type StructureBlockMetadata = {
   pattern: StructurePattern;
@@ -23,18 +33,8 @@ type StructureMetadata = {
   blocks: Array<StructureBlockMetadata>;
 };
 
-const PATTERN_FORMATS: Record<StructurePattern, string> = {
-  A: '0-9A-Za-z',
-  B: '0-9A-Z',
-  C: 'A-Za-z',
-  F: '0-9',
-  L: 'a-z',
-  U: 'A-Z',
-  W: '0-9a-z',
-};
-
 const isStructurePattern = (value: string): value is StructurePattern =>
-  value in PATTERN_FORMATS;
+  Object.hasOwn(PATTERN_FORMATS, value);
 
 /**
  * Parse the BBAN structure used to configure each IBAN Specification and return both the matching
