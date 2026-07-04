@@ -33,8 +33,10 @@ export function getCountry(countryCode: string): Specification {
 }
 
 export type ValidationError =
-  | 'unknown_country'
+  | 'invalid_input'
   | 'bad_length'
+  | 'bad_format'
+  | 'unknown_country'
   | 'mod97_failure';
 
 export type ValidationResult =
@@ -52,27 +54,40 @@ export const electronicFormat = (iban: string): string => {
 /**
  * Validate an IBAN without throwing, returning structured error information.
  * @param {string} iban the IBAN to validate
- * @returns {ValidationResult} the validation status and optional error code
+ * @returns {ValidationResult} the validation status and optional error code:
+ * - `invalid_input`: the input is not a string
+ * - `bad_length`: the input is too short, too long, or the BBAN length does not match the country specification
+ * - `bad_format`: the length is correct but characters violate the country's BBAN block structure
+ * - `unknown_country`: the country code is not a known IBAN country
+ * - `mod97_failure`: the structure is valid but the check digits fail the ISO 7064 Mod 97-10 check
  */
 export const validate = (iban: string): ValidationResult => {
+  if (!isString(iban)) {
+    return { ok: false, error: 'invalid_input' };
+  }
+
   let ibanFormatted: string;
   try {
-    ibanFormatted = electronicFormat(iban);
+    // Only throws for inputs shorter or longer than the allowed IBAN lengths.
+    ibanFormatted = validateAndFormat(iban, true);
   } catch {
     return { ok: false, error: 'bad_length' };
   }
 
-  let countryStructure: Specification;
-  try {
-    countryStructure = getCountry(ibanFormatted.slice(0, 2));
-  } catch {
+  const countryStructure = COUNTRIES[ibanFormatted.slice(0, 2)];
+
+  if (!countryStructure) {
     return { ok: false, error: 'unknown_country' };
   }
 
   const bban = ibanFormatted.slice(4);
 
-  if (!countryStructure.isValidBBAN(bban)) {
+  if (!countryStructure.hasValidBBANLength(bban)) {
     return { ok: false, error: 'bad_length' };
+  }
+
+  if (!countryStructure.matchesBBANStructure(bban)) {
+    return { ok: false, error: 'bad_format' };
   }
 
   if (!countryStructure.isValid(ibanFormatted)) {

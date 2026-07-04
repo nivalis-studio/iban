@@ -133,6 +133,27 @@ describe('IBAN', () => {
       expect(validate('BE68')).toEqual({ ok: false, error: 'bad_length' });
     });
 
+    it('should classify an over-long input as bad_length', () => {
+      expect(validate(`BE68${'5'.repeat(40)}`)).toEqual({
+        ok: false,
+        error: 'bad_length',
+      });
+    });
+
+    it('should classify a BBAN with the wrong length as bad_length', () => {
+      expect(validate('BE6853900754703412')).toEqual({
+        ok: false,
+        error: 'bad_length',
+      });
+    });
+
+    it('should classify wrong characters at the right length as bad_format', () => {
+      expect(validate('NL91ABNA041716430A')).toEqual({
+        ok: false,
+        error: 'bad_format',
+      });
+    });
+
     it('should detect unknown countries', () => {
       expect(validate('ZZ68539007547034')).toEqual({
         ok: false,
@@ -147,9 +168,9 @@ describe('IBAN', () => {
       });
     });
 
-    it('should return bad_length when input is not a string', () => {
+    it('should return invalid_input when input is not a string', () => {
       // @ts-expect-error test the case of an invalid param type
-      expect(validate(123)).toEqual({ ok: false, error: 'bad_length' });
+      expect(validate(123)).toEqual({ ok: false, error: 'invalid_input' });
     });
   });
 
