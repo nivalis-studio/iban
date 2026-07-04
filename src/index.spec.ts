@@ -4,6 +4,7 @@ import {
   describe as describeIban,
   electronicFormat,
   fromBBAN,
+  getCountry,
   isValid,
   isValidBBAN,
   printFormat,
@@ -295,6 +296,27 @@ describe('IBAN', () => {
     it('should return false for non-string countryCode', () => {
       // @ts-expect-error test the case of an invalid param type
       expect(isValidBBAN(123, '539007547034')).toBe(false);
+    });
+  });
+
+  describe('.getCountry', () => {
+    it('should not allow mutating the shared specification registry', () => {
+      const specification = getCountry('BE') as unknown as {
+        countryCode: string;
+        example: string;
+      };
+
+      expect(() => {
+        specification.example = 'CORRUPTED';
+      }).toThrow();
+      expect(() => {
+        specification.countryCode = 'XX';
+      }).toThrow();
+
+      expect(getCountry('BE').example).toBe('BE68539007547034');
+      expect(getCountry('BE').countryCode).toBe('BE');
+      expect(fromBBAN('BE', '539007547034')).toBe('BE68539007547034');
+      expect(isValid('BE68539007547034')).toBe(true);
     });
   });
 });

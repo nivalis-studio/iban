@@ -317,10 +317,11 @@ const COUNTRY_DEFINITIONS = {
   ),
 } as const satisfies Record<string, Specification>;
 
-export const COUNTRIES: Record<string, Specification> = COUNTRY_DEFINITIONS;
+export type CountryCode = keyof typeof COUNTRY_DEFINITIONS;
 
-export const COUNTRY_CODES = Object.freeze(
-  Object.keys(COUNTRY_DEFINITIONS) as Array<keyof typeof COUNTRY_DEFINITIONS>,
-) as ReadonlyArray<keyof typeof COUNTRY_DEFINITIONS>;
+export const COUNTRIES: Readonly<Record<CountryCode, Specification>> =
+  Object.freeze(COUNTRY_DEFINITIONS);
 
-export type CountryCode = (typeof COUNTRY_CODES)[number];
+export const COUNTRY_CODES: ReadonlyArray<CountryCode> = Object.freeze(
+  Object.keys(COUNTRY_DEFINITIONS) as Array<CountryCode>,
+);

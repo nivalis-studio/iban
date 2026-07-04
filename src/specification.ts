@@ -170,8 +170,8 @@ const iso13616Prepare = (iban: string): string => {
  * @class
  */
 export class Specification {
-  countryCode: string;
-  example: string;
+  readonly #countryCode: string;
+  readonly #example: string;
   private readonly length: number;
   private readonly structure: string;
   private cachedStructure: StructureMetadata | undefined;
@@ -182,22 +182,26 @@ export class Specification {
     structure: string,
     example: string,
   ) {
-    this.countryCode = countryCode;
+    this.#countryCode = countryCode;
     this.length = length;
     this.structure = structure;
-    this.example = example;
+    this.#example = example;
   }
 
-  clone(): Specification {
-    const duplicate = new Specification(
-      this.countryCode,
-      this.length,
-      this.structure,
-      this.example,
-    );
-    duplicate.cachedStructure = this.cachedStructure;
+  /**
+   * The ISO 3166-1 alpha-2 country code of this specification.
+   * @returns {string} the country code
+   */
+  get countryCode(): string {
+    return this.#countryCode;
+  }
 
-    return duplicate;
+  /**
+   * An example of a valid IBAN for this specification.
+   * @returns {string} the example IBAN
+   */
+  get example(): string {
+    return this.#example;
   }
 
   /**
