@@ -172,9 +172,9 @@ const iso13616Prepare = (iban: string): string => {
 export class Specification {
   readonly #countryCode: string;
   readonly #example: string;
-  private readonly length: number;
-  private readonly structure: string;
-  private cachedStructure: StructureMetadata | undefined;
+  readonly #length: number;
+  readonly #structure: string;
+  #cachedStructure: StructureMetadata | undefined;
 
   constructor(
     countryCode: string,
@@ -183,8 +183,8 @@ export class Specification {
     example: string,
   ) {
     this.#countryCode = countryCode;
-    this.length = length;
-    this.structure = structure;
+    this.#length = length;
+    this.#structure = structure;
     this.#example = example;
   }
 
@@ -211,7 +211,7 @@ export class Specification {
    */
   isValid(iban: string): boolean {
     return (
-      this.length === iban.length &&
+      this.#length === iban.length &&
       this.countryCode === iban.slice(0, 2) &&
       this.regex().test(iban.slice(4)) &&
       iso7064Mod9710(iso13616Prepare(iban)) === 1
@@ -294,7 +294,7 @@ export class Specification {
    * @returns {boolean} true if the passed bban is a valid BBAN according to this specification, false otherwise
    */
   isValidBBAN(bban: string): boolean {
-    return this.length - 4 === bban.length && this.regex().test(bban);
+    return this.#length - 4 === bban.length && this.regex().test(bban);
   }
 
   /**
@@ -302,9 +302,9 @@ export class Specification {
    * @returns {StructureMetadata} Structure metadata
    */
   private structureMetadata(): StructureMetadata {
-    this.cachedStructure ??= parseStructure(this.structure);
+    this.#cachedStructure ??= parseStructure(this.#structure);
 
-    return this.cachedStructure;
+    return this.#cachedStructure;
   }
 
   /**

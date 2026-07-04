@@ -304,6 +304,8 @@ describe('IBAN', () => {
       const specification = getCountry('BE') as unknown as {
         countryCode: string;
         example: string;
+        length: number;
+        cachedStructure: unknown;
       };
 
       expect(() => {
@@ -312,6 +314,11 @@ describe('IBAN', () => {
       expect(() => {
         specification.countryCode = 'XX';
       }).toThrow();
+
+      // Internal state lives in ES private fields, so these writes only
+      // create inert expando properties that validation never reads.
+      specification.length = 0;
+      specification.cachedStructure = 'CORRUPTED';
 
       expect(getCountry('BE').example).toBe('BE68539007547034');
       expect(getCountry('BE').countryCode).toBe('BE');
