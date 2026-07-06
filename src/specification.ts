@@ -283,6 +283,25 @@ export class Specification {
   }
 
   /**
+   * Check if the passed BBAN has the length expected by this specification.
+   * @param {string} bban the BBAN to check
+   * @returns {boolean} true if the passed bban has the expected length, false otherwise
+   */
+  hasValidBBANLength(bban: string): boolean {
+    return this.length - 4 === bban.length;
+  }
+
+  /**
+   * Check if the passed BBAN matches the block structure (character classes and block lengths)
+   * of this specification, regardless of check digits.
+   * @param {string} bban the BBAN to check
+   * @returns {boolean} true if the passed bban matches the structure, false otherwise
+   */
+  matchesBBANStructure(bban: string): boolean {
+    return this.regex().test(bban);
+  }
+
+  /**
    * Check of the passed BBAN is valid.
    * This function only checks the format of the BBAN (length and matching the letetr/number specs) but does not
    * verify the check digit.
@@ -290,7 +309,7 @@ export class Specification {
    * @returns {boolean} true if the passed bban is a valid BBAN according to this specification, false otherwise
    */
   isValidBBAN(bban: string): boolean {
-    return this.length - 4 === bban.length && this.regex().test(bban);
+    return this.hasValidBBANLength(bban) && this.matchesBBANStructure(bban);
   }
 
   /**
