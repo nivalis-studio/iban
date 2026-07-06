@@ -157,6 +157,10 @@ export class Specification {
     this.#length = length;
     this.#structure = structure;
     this.#example = example;
+    // Blocks both assignment and Object.defineProperty shadowing of the
+    // prototype getters; private fields stay writable, so the lazy
+    // #cachedStructure is unaffected.
+    Object.freeze(this);
   }
 
   /**

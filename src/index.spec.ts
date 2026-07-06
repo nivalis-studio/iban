@@ -348,10 +348,24 @@ describe('IBAN', () => {
         specification.countryCode = 'XX';
       }).toThrow();
 
-      // Internal state lives in ES private fields, so these writes only
-      // create inert expando properties that validation never reads.
-      specification.length = 0;
-      specification.cachedStructure = 'CORRUPTED';
+      // Instances are frozen, so descriptor-based shadowing of the
+      // prototype getters is rejected too.
+      expect(() => {
+        Object.defineProperty(specification, 'countryCode', { value: 'XX' });
+      }).toThrow();
+      expect(() => {
+        Object.defineProperty(specification, 'example', {
+          value: 'CORRUPTED',
+        });
+      }).toThrow();
+
+      // Expando writes are also blocked by the frozen instance.
+      expect(() => {
+        specification.length = 0;
+      }).toThrow();
+      expect(() => {
+        specification.cachedStructure = 'CORRUPTED';
+      }).toThrow();
 
       expect(getCountry('BE').example).toBe('BE68539007547034');
       expect(getCountry('BE').countryCode).toBe('BE');
