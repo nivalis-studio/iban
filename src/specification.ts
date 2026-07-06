@@ -187,11 +187,17 @@ export class Specification {
 
   /**
    * Convert the passed IBAN to a country-specific BBAN.
+   * Throws an error if the IBAN is not valid according to this specification,
+   * including its ISO 7064 mod 97-10 check digits.
    * @param {string} iban the IBAN to convert
    * @param {string} separator the separator to use between BBAN blocks
    * @returns {string} the BBAN
    */
   toBBAN(iban: string, separator: string): string {
+    if (!this.isValid(iban)) {
+      throw new Error('Invalid IBAN');
+    }
+
     const regexMatch = this.regex().exec(iban.slice(4));
 
     if (!regexMatch) {
