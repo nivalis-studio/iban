@@ -287,3 +287,11 @@ export const COUNTRY_CODES = Object.freeze(
 ) as ReadonlyArray<keyof typeof COUNTRY_DEFINITIONS>;
 
 export type CountryCode = (typeof COUNTRY_CODES)[number];
+
+/**
+ * A country code accepted as input by the public API.
+ * The `string & {}` member keeps the union from collapsing to `string`,
+ * so IDEs still autocomplete the known {@link CountryCode} values while
+ * any runtime string remains assignable.
+ */
+export type CountryCodeInput = CountryCode | (string & {});

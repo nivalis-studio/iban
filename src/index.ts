@@ -1,7 +1,9 @@
 import { COUNTRIES, COUNTRY_CODES } from './countries';
 import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
-import type { CountryCode } from './countries';
+import type { CountryCode, CountryCodeInput } from './countries';
 import type { BbanDescription, Specification } from './specification';
+
+export type { CountryCode, CountryCodeInput } from './countries';
 
 const IMMUTABLE_COUNTRIES: Readonly<Record<CountryCode, Specification>> =
   Object.freeze(
@@ -18,10 +20,7 @@ const IMMUTABLE_COUNTRIES: Readonly<Record<CountryCode, Specification>> =
     ) as Record<CountryCode, Specification>,
   );
 
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function getCountry(countryCode: CountryCode): Specification;
-export function getCountry(countryCode: string): Specification;
-export function getCountry(countryCode: string): Specification {
+export function getCountry(countryCode: CountryCodeInput): Specification {
   const normalizedCountryCode = countryCode.toUpperCase().trim();
   const countryStructure = COUNTRIES[normalizedCountryCode];
 
@@ -166,14 +165,11 @@ export const toBBAN = (iban: string, separator = ' '): string => {
  * Convert the passed BBAN to an IBAN for this country specification.
  * Please note that <i>"generation of the IBAN shall be the exclusive responsibility of the bank/branch servicing the account"</i>.
  * This method implements the preferred algorithm described in http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
- * @param {CountryCode} countryCode the country of the BBAN
+ * @param {CountryCodeInput} countryCode the country of the BBAN
  * @param {string} bban the BBAN to convert to IBAN
  * @returns {string} the IBAN
  */
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function fromBBAN(countryCode: CountryCode, bban: string): string;
-export function fromBBAN(countryCode: string, bban: string): string;
-export function fromBBAN(countryCode: string, bban: string): string {
+export function fromBBAN(countryCode: CountryCodeInput, bban: string): string {
   if (!isString(countryCode)) {
     throw new Error('Country code must be a string');
   }
@@ -187,14 +183,14 @@ export function fromBBAN(countryCode: string, bban: string): string {
 
 /**
  * Check the validity of the passed BBAN.
- * @param {CountryCode} countryCode the country of the BBAN
+ * @param {CountryCodeInput} countryCode the country of the BBAN
  * @param {string} bban the BBAN to check the validity of
  * @returns {boolean} true if the passed BBAN is valid, false otherwise
  */
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function isValidBBAN(countryCode: CountryCode, bban: string): boolean;
-export function isValidBBAN(countryCode: string, bban: string): boolean;
-export function isValidBBAN(countryCode: string, bban: string): boolean {
+export function isValidBBAN(
+  countryCode: CountryCodeInput,
+  bban: string,
+): boolean {
   if (!(isString(countryCode) && isString(bban))) {
     return false;
   }
