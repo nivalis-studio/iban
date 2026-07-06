@@ -173,6 +173,33 @@ console.log(Object.keys(countries)); // ['AD', 'AE', 'AL', 'AT', ...]
 console.log(countries['BE'].example); // 'BE68539007547034'
 ```
 
+## Input Sanitization
+
+Every IBAN or BBAN string passed to the library is stripped of all non-alphanumeric characters (anything outside `A-Z`, `a-z`, `0-9`) and converted to uppercase **before** any validation, formatting, or conversion takes place. This applies to spaces, dashes, punctuation, symbols, and unicode characters alike.
+
+Country-code arguments (the first parameter of `fromBBAN` and `isValidBBAN`) are the exception: they are only trimmed and uppercased, never stripped — `fromBBAN('B-E', ...)` throws instead of being sanitized to `'BE'`.
+
+This lenient behavior is intentional and matches the legacy [iban.js](https://github.com/arhs/iban.js) library: IBANs copied from print-formatted documents, bank statements, or web pages often contain separators or stray characters, and they should still validate.
+
+```typescript
+import { isValid, electronicFormat } from '@nivalis/iban';
+
+// Separators and formatting characters are ignored
+isValid('BE68 5390 0754 7034'); // true
+isValid('BE68-5390-0754-7034'); // true
+
+// So are arbitrary symbols and unicode characters
+isValid('BE68_5390!0754@7034'); // true
+isValid('BE68·5390·0754·7034é'); // true
+
+electronicFormat('BE68·5390·0754·7034é'); // 'BE68539007547034'
+```
+
+Keep in mind the consequences:
+
+- Sanitization happens before **all** validation, so `validate()` can never report an error for a stripped character — a string containing junk characters is judged solely on its remaining alphanumeric content
+- If you need to reject inputs containing unexpected characters, check the raw string yourself before calling the library
+
 ## Supported Countries
 
 The library supports IBAN validation for 70+ countries and territories:
