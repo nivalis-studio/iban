@@ -141,11 +141,11 @@ const iso13616Prepare = (iban: string): string => {
  * @class
  */
 export class Specification {
-  countryCode: string;
-  example: string;
-  private readonly length: number;
-  private readonly structure: string;
-  private cachedStructure: StructureMetadata | undefined;
+  readonly #countryCode: string;
+  readonly #example: string;
+  readonly #length: number;
+  readonly #structure: string;
+  #cachedStructure: StructureMetadata | undefined;
 
   constructor(
     countryCode: string,
@@ -153,22 +153,30 @@ export class Specification {
     structure: string,
     example: string,
   ) {
-    this.countryCode = countryCode;
-    this.length = length;
-    this.structure = structure;
-    this.example = example;
+    this.#countryCode = countryCode;
+    this.#length = length;
+    this.#structure = structure;
+    this.#example = example;
+    // Blocks both assignment and Object.defineProperty shadowing of the
+    // prototype getters; private fields stay writable, so the lazy
+    // #cachedStructure is unaffected.
+    Object.freeze(this);
   }
 
-  clone(): Specification {
-    const duplicate = new Specification(
-      this.countryCode,
-      this.length,
-      this.structure,
-      this.example,
-    );
-    duplicate.cachedStructure = this.cachedStructure;
+  /**
+   * The ISO 3166-1 alpha-2 country code of this specification.
+   * @returns {string} the country code
+   */
+  get countryCode(): string {
+    return this.#countryCode;
+  }
 
-    return duplicate;
+  /**
+   * An example of a valid IBAN for this specification.
+   * @returns {string} the example IBAN
+   */
+  get example(): string {
+    return this.#example;
   }
 
   /**
@@ -178,8 +186,8 @@ export class Specification {
    */
   isValid(iban: string): boolean {
     return (
-      this.length === iban.length &&
-      this.countryCode === iban.slice(0, 2) &&
+      this.#length === iban.length &&
+      this.#countryCode === iban.slice(0, 2) &&
       this.regex().test(iban.slice(4)) &&
       iso7064Mod9710(iso13616Prepare(iban)) === 1
     );
@@ -252,11 +260,11 @@ export class Specification {
     }
 
     const remainder = iso7064Mod9710(
-      iso13616Prepare(`${this.countryCode}00${bban}`),
+      iso13616Prepare(`${this.#countryCode}00${bban}`),
     );
     const checkDigit = `0${98 - remainder}`.slice(-2);
 
-    return `${this.countryCode}${checkDigit}${bban}`;
+    return `${this.#countryCode}${checkDigit}${bban}`;
   }
 
   /**
@@ -265,7 +273,7 @@ export class Specification {
    * @returns {boolean} true if the passed bban has the expected length, false otherwise
    */
   hasValidBBANLength(bban: string): boolean {
-    return this.length - 4 === bban.length;
+    return this.#length - 4 === bban.length;
   }
 
   /**
@@ -294,9 +302,9 @@ export class Specification {
    * @returns {StructureMetadata} Structure metadata
    */
   private structureMetadata(): StructureMetadata {
-    this.cachedStructure ??= parseStructure(this.structure);
+    this.#cachedStructure ??= parseStructure(this.#structure);
 
-    return this.cachedStructure;
+    return this.#cachedStructure;
   }
 
   /**

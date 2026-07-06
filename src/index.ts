@@ -1,34 +1,25 @@
-import { COUNTRIES, COUNTRY_CODES } from './countries';
+import { COUNTRIES } from './countries';
 import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
 import type { CountryCode, CountryCodeInput } from './countries';
 import type { BbanDescription, Specification } from './specification';
 
 export type { CountryCode, CountryCodeInput } from './countries';
 
-const IMMUTABLE_COUNTRIES: Readonly<Record<CountryCode, Specification>> =
-  Object.freeze(
-    Object.fromEntries(
-      COUNTRY_CODES.map(code => {
-        const specification = COUNTRIES[code];
+const isCountryCode = (countryCode: string): countryCode is CountryCode =>
+  Object.hasOwn(COUNTRIES, countryCode);
 
-        if (!specification) {
-          throw new Error(`Missing country specification for ${code}`);
-        }
-
-        return [code, specification.clone()];
-      }),
-    ) as Record<CountryCode, Specification>,
-  );
-
-export function getCountry(countryCode: CountryCodeInput): Specification {
+const toCountryCode = (countryCode: string): CountryCode => {
   const normalizedCountryCode = countryCode.toUpperCase().trim();
-  const countryStructure = COUNTRIES[normalizedCountryCode];
 
-  if (!countryStructure) {
+  if (!isCountryCode(normalizedCountryCode)) {
     throw new Error(`No country with code ${normalizedCountryCode}`);
   }
 
-  return countryStructure;
+  return normalizedCountryCode;
+};
+
+export function getCountry(countryCode: CountryCodeInput): Specification {
+  return COUNTRIES[toCountryCode(countryCode)];
 }
 
 export type ValidationError =
@@ -83,11 +74,13 @@ export const validate = (iban: string): ValidationResult => {
     return { ok: false, error: 'bad_length' };
   }
 
-  const countryStructure = COUNTRIES[ibanFormatted.slice(0, 2)];
+  const countryCode = ibanFormatted.slice(0, 2);
 
-  if (!countryStructure) {
+  if (!isCountryCode(countryCode)) {
     return { ok: false, error: 'unknown_country' };
   }
+
+  const countryStructure = COUNTRIES[countryCode];
 
   const bban = ibanFormatted.slice(4);
 
@@ -132,12 +125,13 @@ export const describe = (iban: string): DescribeResult => {
   }
 
   const ibanFormatted = electronicFormat(iban);
-  const specification = getCountry(ibanFormatted.slice(0, 2));
+  const country = toCountryCode(ibanFormatted.slice(0, 2));
+  const specification = COUNTRIES[country];
   const bban = ibanFormatted.slice(4);
   const { blocks, groups } = specification.describeBBAN(bban);
 
   return {
-    country: specification.countryCode as CountryCode,
+    country,
     iban: ibanFormatted,
     bban,
     blocks,
@@ -218,4 +212,4 @@ export const printFormat = (iban: string, separator = ' '): string => {
 
 export const availableCountries = (): Readonly<
   Record<CountryCode, Specification>
-> => IMMUTABLE_COUNTRIES;
+> => COUNTRIES;
