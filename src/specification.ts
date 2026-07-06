@@ -1,6 +1,16 @@
 import { A_CODE_POINT_AT } from './utils';
 
-export type StructurePattern = 'A' | 'B' | 'C' | 'F' | 'L' | 'U' | 'W';
+const PATTERN_FORMATS = {
+  A: '0-9A-Za-z',
+  B: '0-9A-Z',
+  C: 'A-Za-z',
+  F: '0-9',
+  L: 'a-z',
+  U: 'A-Z',
+  W: '0-9a-z',
+};
+
+export type StructurePattern = keyof typeof PATTERN_FORMATS;
 
 export type StructureBlockMetadata = {
   pattern: StructurePattern;
@@ -23,6 +33,9 @@ type StructureMetadata = {
   blocks: Array<StructureBlockMetadata>;
 };
 
+const isStructurePattern = (value: string): value is StructurePattern =>
+  Object.hasOwn(PATTERN_FORMATS, value);
+
 /**
  * Parse the BBAN structure used to configure each IBAN Specification and return both the matching
  * regular expression and the block metadata.
@@ -33,6 +46,12 @@ type StructureMetadata = {
  * @returns {StructureMetadata} the parsed metadata
  */
 const parseStructure = (structure: string): StructureMetadata => {
+  if (structure.length % 3 !== 0) {
+    throw new Error(
+      `Invalid structure "${structure}": length must be a multiple of 3`,
+    );
+  }
+
   const blockChunks = structure.match(/.{3}/g);
 
   if (!blockChunks) {
@@ -43,12 +62,10 @@ const parseStructure = (structure: string): StructureMetadata => {
   let offset = 0;
 
   const regexParts = blockChunks.map((chunk, index) => {
-    let format: string;
+    const pattern = chunk.charAt(0);
 
-    const pattern = chunk.charAt(0) as StructurePattern;
-
-    if (!pattern) {
-      throw new Error('Invalid structure block');
+    if (!isStructurePattern(pattern)) {
+      throw new Error(`Unknown structure pattern "${pattern}"`);
     }
 
     const repeats = Number.parseInt(chunk.slice(1), 10);
@@ -57,53 +74,7 @@ const parseStructure = (structure: string): StructureMetadata => {
       throw new Error('Invalid structure block length');
     }
 
-    switch (pattern) {
-      case 'A': {
-        format = '0-9A-Za-z';
-
-        break;
-      }
-
-      case 'B': {
-        format = '0-9A-Z';
-
-        break;
-      }
-
-      case 'C': {
-        format = 'A-Za-z';
-
-        break;
-      }
-
-      case 'F': {
-        format = '0-9';
-
-        break;
-      }
-
-      case 'L': {
-        format = 'a-z';
-
-        break;
-      }
-
-      case 'U': {
-        format = 'A-Z';
-
-        break;
-      }
-
-      case 'W': {
-        format = '0-9a-z';
-
-        break;
-      }
-
-      default: {
-        throw new Error(`Unknown structure pattern "${pattern}"`);
-      }
-    }
+    const format = PATTERN_FORMATS[pattern];
 
     blocks.push({
       pattern,
@@ -220,11 +191,17 @@ export class Specification {
 
   /**
    * Convert the passed IBAN to a country-specific BBAN.
+   * Throws an error if the IBAN is not valid according to this specification,
+   * including its ISO 7064 mod 97-10 check digits.
    * @param {string} iban the IBAN to convert
    * @param {string} separator the separator to use between BBAN blocks
    * @returns {string} the BBAN
    */
   toBBAN(iban: string, separator: string): string {
+    if (!this.isValid(iban)) {
+      throw new Error('Invalid IBAN');
+    }
+
     const regexMatch = this.regex().exec(iban.slice(4));
 
     if (!regexMatch) {
@@ -287,6 +264,25 @@ export class Specification {
   }
 
   /**
+   * Check if the passed BBAN has the length expected by this specification.
+   * @param {string} bban the BBAN to check
+   * @returns {boolean} true if the passed bban has the expected length, false otherwise
+   */
+  hasValidBBANLength(bban: string): boolean {
+    return this.#length - 4 === bban.length;
+  }
+
+  /**
+   * Check if the passed BBAN matches the block structure (character classes and block lengths)
+   * of this specification, regardless of check digits.
+   * @param {string} bban the BBAN to check
+   * @returns {boolean} true if the passed bban matches the structure, false otherwise
+   */
+  matchesBBANStructure(bban: string): boolean {
+    return this.regex().test(bban);
+  }
+
+  /**
    * Check of the passed BBAN is valid.
    * This function only checks the format of the BBAN (length and matching the letetr/number specs) but does not
    * verify the check digit.
@@ -294,7 +290,7 @@ export class Specification {
    * @returns {boolean} true if the passed bban is a valid BBAN according to this specification, false otherwise
    */
   isValidBBAN(bban: string): boolean {
-    return this.#length - 4 === bban.length && this.regex().test(bban);
+    return this.hasValidBBANLength(bban) && this.matchesBBANStructure(bban);
   }
 
   /**

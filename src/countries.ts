@@ -1,5 +1,9 @@
 import { Specification } from './specification';
 
+/* France and its territories share the same IBAN structure, only the country code varies */
+const frenchSpec = (countryCode: string, example: string) =>
+  new Specification(countryCode, 27, 'F05F05A11F02', example);
+
 const COUNTRY_DEFINITIONS = {
   'AD': new Specification('AD', 24, 'F04F04A12', 'AD1200012030200359100100'),
   'AE': new Specification('AE', 23, 'F03F16', 'AE070331234567890123456'),
@@ -10,6 +14,13 @@ const COUNTRY_DEFINITIONS = {
   'BE': new Specification('BE', 16, 'F03F07F02', 'BE68539007547034'),
   'BG': new Specification('BG', 22, 'U04F04F02A08', 'BG80BNBG96611020345678'),
   'BH': new Specification('BH', 22, 'U04A14', 'BH67BMAG00001299123456'),
+
+  'BI': new Specification(
+    'BI',
+    27,
+    'F05F05F11F02',
+    'BI4210000100010000332045181',
+  ),
 
   'BR': new Specification(
     'BR',
@@ -36,6 +47,14 @@ const COUNTRY_DEFINITIONS = {
 
   'CZ': new Specification('CZ', 24, 'F04F06F10', 'CZ6508000000192000145399'),
   'DE': new Specification('DE', 22, 'F08F10', 'DE89370400440532013000'),
+
+  'DJ': new Specification(
+    'DJ',
+    27,
+    'F05F05F11F02',
+    'DJ2100010000000154000100186',
+  ),
+
   'DK': new Specification('DK', 18, 'F04F09F01', 'DK5000400440116243'),
   'DO': new Specification('DO', 28, 'U04F20', 'DO28BAGR00000001212453611324'),
   'EE': new Specification('EE', 20, 'F02F02F11F01', 'EE382200221020145685'),
@@ -55,15 +74,10 @@ const COUNTRY_DEFINITIONS = {
   ),
 
   'FI': new Specification('FI', 18, 'F06F07F01', 'FI2112345600000785'),
+  'FK': new Specification('FK', 18, 'U02F12', 'FK88SC123456789012'),
   'FO': new Specification('FO', 18, 'F04F09F01', 'FO6264600001631634'),
 
-  'FR': new Specification(
-    'FR',
-    27,
-    'F05F05A11F02',
-    'FR1420041010050500013M02606',
-  ),
-
+  'FR': frenchSpec('FR', 'FR1420041010050500013M02606'),
   'GB': new Specification('GB', 22, 'U04F06F08', 'GB29NWBK60161331926819'),
   'GE': new Specification('GE', 22, 'U02F16', 'GE29NB0000000101904917'),
   'GI': new Specification('GI', 23, 'U04A15', 'GI75NWBK000000007099453'),
@@ -72,6 +86,7 @@ const COUNTRY_DEFINITIONS = {
   'GR': new Specification('GR', 27, 'F03F04A16', 'GR1601101250000000012300695'),
 
   'GT': new Specification('GT', 28, 'A04A20', 'GT82TRAJ01020000001210029690'),
+  'HN': new Specification('HN', 28, 'U04F20', 'HN88CABF00000000000250005469'),
   'HR': new Specification('HR', 21, 'F07F10', 'HR1210010051863000160'),
 
   'HU': new Specification(
@@ -117,6 +132,7 @@ const COUNTRY_DEFINITIONS = {
   'LI': new Specification('LI', 21, 'F05A12', 'LI21088100002324013AA'),
   'LT': new Specification('LT', 20, 'F05F11', 'LT121000011101001000'),
   'LU': new Specification('LU', 20, 'F03A13', 'LU280019400644750000'),
+  'LY': new Specification('LY', 25, 'F03F03F15', 'LY83002048000020100120361'),
 
   'MC': new Specification(
     'MC',
@@ -128,6 +144,7 @@ const COUNTRY_DEFINITIONS = {
   'MD': new Specification('MD', 24, 'U02A18', 'MD24AG000225100013104168'),
   'ME': new Specification('ME', 22, 'F03F13F02', 'ME25505000012345678951'),
   'MK': new Specification('MK', 19, 'F03A10F02', 'MK07250120000058984'),
+  'MN': new Specification('MN', 20, 'F04F12', 'MN121234123456789123'),
 
   'MR': new Specification(
     'MR',
@@ -150,8 +167,10 @@ const COUNTRY_DEFINITIONS = {
     'MU17BOMM0101101030300200000MUR',
   ),
 
+  'NI': new Specification('NI', 28, 'U04F20', 'NI45BAPR00000013000003558124'),
   'NL': new Specification('NL', 18, 'U04F10', 'NL91ABNA0417164300'),
   'NO': new Specification('NO', 15, 'F04F06F01', 'NO9386011117947'),
+  'OM': new Specification('OM', 23, 'F03A16', 'OM810180000001299123456'),
   'PK': new Specification('PK', 24, 'U04A16', 'PK36SCBL0000001123456702'),
   'PL': new Specification('PL', 28, 'F08F16', 'PL61109010140000071219812874'),
 
@@ -168,6 +187,14 @@ const COUNTRY_DEFINITIONS = {
 
   'RO': new Specification('RO', 24, 'U04A16', 'RO49AAAA1B31007593840000'),
   'RS': new Specification('RS', 22, 'F03F13F02', 'RS35260005601001611379'),
+
+  'RU': new Specification(
+    'RU',
+    33,
+    'F09F05A15',
+    'RU0304452522540817810538091310419',
+  ),
+
   'SA': new Specification('SA', 24, 'F02A18', 'SA0380000000608010167519'),
 
   'SC': new Specification(
@@ -177,6 +204,7 @@ const COUNTRY_DEFINITIONS = {
     'SC18SSCB11010000000000001497USD',
   ),
 
+  'SD': new Specification('SD', 18, 'F02F12', 'SD2129010501234001'),
   'SE': new Specification('SE', 24, 'F03F16F01', 'SE4550000000058398257466'),
   'SI': new Specification('SI', 19, 'F05F08F02', 'SI56263300012039086'),
   'SK': new Specification('SK', 24, 'F04F06F10', 'SK3112000000198742637541'),
@@ -188,6 +216,7 @@ const COUNTRY_DEFINITIONS = {
     'SM86U0322509800000000270100',
   ),
 
+  'SO': new Specification('SO', 23, 'F04F03F12', 'SO211000001001000100141'),
   'ST': new Specification('ST', 25, 'F08F11F02', 'ST68000100010051845310112'),
   'SV': new Specification('SV', 28, 'U04F20', 'SV62CENR00000000000000700025'),
   'TL': new Specification('TL', 23, 'F03F14F02', 'TL380080012345678910157'),
@@ -201,14 +230,19 @@ const COUNTRY_DEFINITIONS = {
   'VG': new Specification('VG', 24, 'U04F16', 'VG96VPVG0000012345678901'),
   'XK': new Specification('XK', 20, 'F04F10F02', 'XK051212012345678906'),
 
+  'YE': new Specification(
+    'YE',
+    30,
+    'U04F04A18',
+    'YE15CBYE0001018861234567891234',
+  ),
+
   // The following countries are not included in the official IBAN registry but use the IBAN specification
 
   // Angola
   'AO': new Specification('AO', 25, 'F21', 'AO69123456789012345678901'),
   // Burkina
   'BF': new Specification('BF', 27, 'F23', 'BF2312345678901234567890123'),
-  // Burundi
-  'BI': new Specification('BI', 16, 'F12', 'BI41123456789012'),
   // Benin
   'BJ': new Specification('BJ', 28, 'F24', 'BJ39123456789012345678901234'),
   // Ivory
@@ -232,89 +266,18 @@ const COUNTRY_DEFINITIONS = {
 
   // The following are regional and administrative French Republic subdivision IBAN specification (same structure as FR, only country code vary)
 
-  'GF': new Specification(
-    'GF',
-    27,
-    'F05F05A11F02',
-    'GF121234512345123456789AB13',
-  ),
-
-  'GP': new Specification(
-    'GP',
-    27,
-    'F05F05A11F02',
-    'GP791234512345123456789AB13',
-  ),
-
-  'MQ': new Specification(
-    'MQ',
-    27,
-    'F05F05A11F02',
-    'MQ221234512345123456789AB13',
-  ),
-
-  'RE': new Specification(
-    'RE',
-    27,
-    'F05F05A11F02',
-    'RE131234512345123456789AB13',
-  ),
-
-  'PF': new Specification(
-    'PF',
-    27,
-    'F05F05A11F02',
-    'PF281234512345123456789AB13',
-  ),
-
-  'TF': new Specification(
-    'TF',
-    27,
-    'F05F05A11F02',
-    'TF891234512345123456789AB13',
-  ),
-
-  'YT': new Specification(
-    'YT',
-    27,
-    'F05F05A11F02',
-    'YT021234512345123456789AB13',
-  ),
-
-  'NC': new Specification(
-    'NC',
-    27,
-    'F05F05A11F02',
-    'NC551234512345123456789AB13',
-  ),
-
-  'BL': new Specification(
-    'BL',
-    27,
-    'F05F05A11F02',
-    'BL391234512345123456789AB13',
-  ),
-
-  'MF': new Specification(
-    'MF',
-    27,
-    'F05F05A11F02',
-    'MF551234512345123456789AB13',
-  ),
-
-  'PM': new Specification(
-    'PM',
-    27,
-    'F05F05A11F02',
-    'PM071234512345123456789AB13',
-  ),
-
-  'WF': new Specification(
-    'WF',
-    27,
-    'F05F05A11F02',
-    'WF621234512345123456789AB13',
-  ),
+  'GF': frenchSpec('GF', 'GF121234512345123456789AB13'),
+  'GP': frenchSpec('GP', 'GP791234512345123456789AB13'),
+  'MQ': frenchSpec('MQ', 'MQ221234512345123456789AB13'),
+  'RE': frenchSpec('RE', 'RE131234512345123456789AB13'),
+  'PF': frenchSpec('PF', 'PF281234512345123456789AB13'),
+  'TF': frenchSpec('TF', 'TF891234512345123456789AB13'),
+  'YT': frenchSpec('YT', 'YT021234512345123456789AB13'),
+  'NC': frenchSpec('NC', 'NC551234512345123456789AB13'),
+  'BL': frenchSpec('BL', 'BL391234512345123456789AB13'),
+  'MF': frenchSpec('MF', 'MF551234512345123456789AB13'),
+  'PM': frenchSpec('PM', 'PM071234512345123456789AB13'),
+  'WF': frenchSpec('WF', 'WF621234512345123456789AB13'),
 } as const satisfies Record<string, Specification>;
 
 export type CountryCode = keyof typeof COUNTRY_DEFINITIONS;
@@ -325,3 +288,11 @@ export const COUNTRIES: Readonly<Record<CountryCode, Specification>> =
 export const COUNTRY_CODES: ReadonlyArray<CountryCode> = Object.freeze(
   Object.keys(COUNTRY_DEFINITIONS) as Array<CountryCode>,
 );
+
+/**
+ * A country code accepted as input by the public API.
+ * The `string & {}` member keeps the union from collapsing to `string`,
+ * so IDEs still autocomplete the known {@link CountryCode} values while
+ * any runtime string remains assignable.
+ */
+export type CountryCodeInput = CountryCode | (string & {});

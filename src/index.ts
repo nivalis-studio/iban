@@ -1,7 +1,9 @@
 import { COUNTRIES } from './countries';
 import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
-import type { CountryCode } from './countries';
+import type { CountryCode, CountryCodeInput } from './countries';
 import type { BbanDescription, Specification } from './specification';
+
+export type { CountryCode, CountryCodeInput } from './countries';
 
 const isCountryCode = (countryCode: string): countryCode is CountryCode =>
   Object.hasOwn(COUNTRIES, countryCode);
@@ -16,22 +18,29 @@ const toCountryCode = (countryCode: string): CountryCode => {
   return normalizedCountryCode;
 };
 
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function getCountry(countryCode: CountryCode): Specification;
-export function getCountry(countryCode: string): Specification;
-export function getCountry(countryCode: string): Specification {
+export function getCountry(countryCode: CountryCodeInput): Specification {
   return COUNTRIES[toCountryCode(countryCode)];
 }
 
 export type ValidationError =
-  | 'unknown_country'
+  | 'invalid_input'
   | 'bad_length'
+  | 'bad_format'
+  | 'unknown_country'
   | 'mod97_failure';
 
 export type ValidationResult =
   | { ok: true }
   | { ok: false; error: ValidationError };
 
+/**
+ * Convert an IBAN to its electronic format.
+ * Note: every non-alphanumeric character (spaces, dashes, punctuation,
+ * unicode symbols, ...) is stripped and the result is uppercased before
+ * any processing.
+ * @param {string} iban the IBAN to format
+ * @returns {string} the IBAN in uppercase, alphanumeric-only electronic format
+ */
 export const electronicFormat = (iban: string): string => {
   if (!isString(iban)) {
     throw new Error('IBAN must be a string');
@@ -42,28 +51,45 @@ export const electronicFormat = (iban: string): string => {
 
 /**
  * Validate an IBAN without throwing, returning structured error information.
+ * Note: non-alphanumeric characters are stripped from the input before
+ * validation, so no error is ever reported for stripped characters.
  * @param {string} iban the IBAN to validate
- * @returns {ValidationResult} the validation status and optional error code
+ * @returns {ValidationResult} the validation status and optional error code:
+ * - `invalid_input`: the input is not a string
+ * - `bad_length`: the input is too short, too long, or the BBAN length does not match the country specification
+ * - `bad_format`: the length is correct but characters violate the country's BBAN block structure
+ * - `unknown_country`: the country code is not a known IBAN country
+ * - `mod97_failure`: the structure is valid but the check digits fail the ISO 7064 Mod 97-10 check
  */
 export const validate = (iban: string): ValidationResult => {
+  if (!isString(iban)) {
+    return { ok: false, error: 'invalid_input' };
+  }
+
   let ibanFormatted: string;
   try {
-    ibanFormatted = electronicFormat(iban);
+    // Only throws for inputs shorter or longer than the allowed IBAN lengths.
+    ibanFormatted = validateAndFormat(iban, true);
   } catch {
     return { ok: false, error: 'bad_length' };
   }
 
-  let countryStructure: Specification;
-  try {
-    countryStructure = getCountry(ibanFormatted.slice(0, 2));
-  } catch {
+  const countryCode = ibanFormatted.slice(0, 2);
+
+  if (!isCountryCode(countryCode)) {
     return { ok: false, error: 'unknown_country' };
   }
 
+  const countryStructure = COUNTRIES[countryCode];
+
   const bban = ibanFormatted.slice(4);
 
-  if (!countryStructure.isValidBBAN(bban)) {
+  if (!countryStructure.hasValidBBANLength(bban)) {
     return { ok: false, error: 'bad_length' };
+  }
+
+  if (!countryStructure.matchesBBANStructure(bban)) {
+    return { ok: false, error: 'bad_format' };
   }
 
   if (!countryStructure.isValid(ibanFormatted)) {
@@ -75,6 +101,8 @@ export const validate = (iban: string): ValidationResult => {
 
 /**
  * Check if an IBAN is valid. Does not throw an error if the IBAN is invalid.
+ * Note: non-alphanumeric characters are stripped from the input before
+ * validation, so print-formatted IBANs (e.g. 'BE68 5390 0754 7034') are valid.
  * @param {string} iban the IBAN to validate.
  * @returns {boolean} true if the passed IBAN is valid, false otherwise
  */
@@ -131,14 +159,11 @@ export const toBBAN = (iban: string, separator = ' '): string => {
  * Convert the passed BBAN to an IBAN for this country specification.
  * Please note that <i>"generation of the IBAN shall be the exclusive responsibility of the bank/branch servicing the account"</i>.
  * This method implements the preferred algorithm described in http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
- * @param {CountryCode} countryCode the country of the BBAN
+ * @param {CountryCodeInput} countryCode the country of the BBAN
  * @param {string} bban the BBAN to convert to IBAN
  * @returns {string} the IBAN
  */
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function fromBBAN(countryCode: CountryCode, bban: string): string;
-export function fromBBAN(countryCode: string, bban: string): string;
-export function fromBBAN(countryCode: string, bban: string): string {
+export function fromBBAN(countryCode: CountryCodeInput, bban: string): string {
   if (!isString(countryCode)) {
     throw new Error('Country code must be a string');
   }
@@ -152,14 +177,14 @@ export function fromBBAN(countryCode: string, bban: string): string {
 
 /**
  * Check the validity of the passed BBAN.
- * @param {CountryCode} countryCode the country of the BBAN
+ * @param {CountryCodeInput} countryCode the country of the BBAN
  * @param {string} bban the BBAN to check the validity of
  * @returns {boolean} true if the passed BBAN is valid, false otherwise
  */
-/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
-export function isValidBBAN(countryCode: CountryCode, bban: string): boolean;
-export function isValidBBAN(countryCode: string, bban: string): boolean;
-export function isValidBBAN(countryCode: string, bban: string): boolean {
+export function isValidBBAN(
+  countryCode: CountryCodeInput,
+  bban: string,
+): boolean {
   if (!(isString(countryCode) && isString(bban))) {
     return false;
   }
