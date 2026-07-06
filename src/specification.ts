@@ -187,7 +187,7 @@ export class Specification {
   isValid(iban: string): boolean {
     return (
       this.#length === iban.length &&
-      this.countryCode === iban.slice(0, 2) &&
+      this.#countryCode === iban.slice(0, 2) &&
       this.regex().test(iban.slice(4)) &&
       iso7064Mod9710(iso13616Prepare(iban)) === 1
     );
@@ -260,11 +260,11 @@ export class Specification {
     }
 
     const remainder = iso7064Mod9710(
-      iso13616Prepare(`${this.countryCode}00${bban}`),
+      iso13616Prepare(`${this.#countryCode}00${bban}`),
     );
     const checkDigit = `0${98 - remainder}`.slice(-2);
 
-    return `${this.countryCode}${checkDigit}${bban}`;
+    return `${this.#countryCode}${checkDigit}${bban}`;
   }
 
   /**
