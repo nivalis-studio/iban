@@ -56,7 +56,7 @@ const COUNTRY_DEFINITIONS = {
   ),
 
   'DK': new Specification('DK', 18, 'F04F09F01', 'DK5000400440116243'),
-  'DO': new Specification('DO', 28, 'U04F20', 'DO28BAGR00000001212453611324'),
+  'DO': new Specification('DO', 28, 'A04F20', 'DO28BAGR00000001212453611324'),
   'EE': new Specification('EE', 20, 'F02F02F11F01', 'EE382200221020145685'),
 
   'EG': new Specification(
@@ -115,7 +115,12 @@ const COUNTRY_DEFINITIONS = {
 
   'IQ': new Specification('IQ', 23, 'U04F03A12', 'IQ98NBIQ850123456789012'),
 
-  'JO': new Specification('JO', 30, 'A04F22', 'JO15AAAA1234567890123456789012'),
+  'JO': new Specification(
+    'JO',
+    30,
+    'U04F04A18',
+    'JO15AAAA1234567890123456789012',
+  ),
 
   'KW': new Specification('KW', 30, 'U04A22', 'KW81CBKU0000000000001234560101'),
 
@@ -125,7 +130,7 @@ const COUNTRY_DEFINITIONS = {
   'LC': new Specification(
     'LC',
     32,
-    'U04F24',
+    'U04A24',
     'LC07HEMM000100010012001200013015',
   ),
 
@@ -141,7 +146,7 @@ const COUNTRY_DEFINITIONS = {
     'MC5811222000010123456789030',
   ),
 
-  'MD': new Specification('MD', 24, 'U02A18', 'MD24AG000225100013104168'),
+  'MD': new Specification('MD', 24, 'A02A18', 'MD24AG000225100013104168'),
   'ME': new Specification('ME', 22, 'F03F13F02', 'ME25505000012345678951'),
   'MK': new Specification('MK', 19, 'F03A10F02', 'MK07250120000058984'),
   'MN': new Specification('MN', 20, 'F04F12', 'MN121234123456789123'),
@@ -225,7 +230,7 @@ const COUNTRY_DEFINITIONS = {
 
   'TR': new Specification('TR', 26, 'F05F01A16', 'TR330006100519786457841326'),
 
-  'UA': new Specification('UA', 29, 'F25', 'UA511234567890123456789012345'),
+  'UA': new Specification('UA', 29, 'F06A19', 'UA511234567890123456789012345'),
   'VA': new Specification('VA', 22, 'F18', 'VA59001123000012345678'),
   'VG': new Specification('VG', 24, 'U04F16', 'VG96VPVG0000012345678901'),
   'XK': new Specification('XK', 20, 'F04F10F02', 'XK051212012345678906'),
