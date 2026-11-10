@@ -14,6 +14,8 @@ import {
 import type { CountryCode } from './countries';
 
 const INVALID_BBAN_REGEX = /Invalid BBAN/;
+// Matches the last decimal digit in a string (followed only by non-digits).
+const LAST_DIGIT_REGEX = /\d(?=\D*$)/;
 
 describe('IBAN', () => {
   describe('.isValid', () => {
@@ -80,7 +82,7 @@ describe('IBAN', () => {
       }
     });
 
-    it('should return false for all examples when modifying just one digit', () => {
+    it('should fail the mod97 check for all examples when modifying just one digit', () => {
       const countryList = availableCountries();
 
       for (const countryCode of Object.keys(
@@ -92,10 +94,21 @@ describe('IBAN', () => {
           throw new Error(`Missing country specification for ${countryCode}`);
         }
 
-        let num = country.example;
+        const { example } = country;
+        // Mutate the last DIGIT (not the last character): some examples end in
+        // letters (LI, MT, MU, SC). Keeping length and character class means
+        // the only check left that can fail is mod 97-10. A one-digit change
+        // alters the number by d*10^k (d in 1..9), never divisible by 97.
+        const index = example.search(LAST_DIGIT_REGEX);
 
-        num = `${num.slice(0, -1)}${(Number.parseInt(num.slice(-1), 10) + 1) % 10}`;
-        expect(isValid(num)).toBe(false);
+        expect(index).toBeGreaterThanOrEqual(4); // digit is inside the BBAN
+
+        const mutated = `${example.slice(0, index)}${(Number(example.charAt(index)) + 1) % 10}${example.slice(index + 1)}`;
+
+        expect(validate(mutated)).toEqual({
+          ok: false,
+          error: 'mod97_failure',
+        });
       }
     });
 
@@ -256,6 +269,12 @@ describe('IBAN', () => {
     it('should throw an error for an IBAN with invalid check digits', () => {
       expect(() => toBBAN('BE99539007547034')).toThrow('Invalid IBAN');
     });
+
+    it('should throw for an IBAN with an unknown country code', () => {
+      expect(() => toBBAN('ZZ68539007547034')).toThrow(
+        'No country with code ZZ',
+      );
+    });
   });
 
   describe('.fromBBAN', () => {
@@ -287,6 +306,25 @@ describe('IBAN', () => {
     it('should throw an error for non-string BBAN', () => {
       // @ts-expect-error test the case of an invalid param type
       expect(() => fromBBAN('BE', 123)).toThrow('BBAN must be a string');
+    });
+
+    it('should round-trip every example through toBBAN and fromBBAN', () => {
+      const countryList = availableCountries();
+
+      for (const countryCode of Object.keys(
+        countryList,
+      ) as Array<CountryCode>) {
+        const country = countryList[countryCode];
+
+        if (!country) {
+          throw new Error(`Missing country specification for ${countryCode}`);
+        }
+
+        const bban = toBBAN(country.example, '');
+
+        expect(isValidBBAN(countryCode, bban)).toBe(true);
+        expect(fromBBAN(countryCode, bban)).toBe(country.example);
+      }
     });
   });
 
@@ -330,9 +368,21 @@ describe('IBAN', () => {
       // @ts-expect-error test the case of an invalid param type
       expect(isValidBBAN(123, '539007547034')).toBe(false);
     });
+
+    it('should return false for an unknown country code', () => {
+      expect(isValidBBAN('ZZ', '539007547034')).toBe(false);
+    });
+
+    it('should return false for a BBAN that is too long', () => {
+      expect(isValidBBAN('BE', '5'.repeat(40))).toBe(false);
+    });
   });
 
   describe('.getCountry', () => {
+    it('should throw for an unknown country code', () => {
+      expect(() => getCountry('ZZ')).toThrow('No country with code ZZ');
+    });
+
     it('should not allow mutating the shared specification registry', () => {
       const specification = getCountry('BE') as unknown as {
         countryCode: string;
