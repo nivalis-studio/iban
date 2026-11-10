@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**@nivalis/iban** is a modern TypeScript library for validating, formatting, and converting International Bank Account Numbers (IBANs) and Basic Bank Account Numbers (BBANs). It supports 70+ countries according to ISO 13616 standard with zero dependencies.
+**@nivalis/iban** is a modern TypeScript library for validating, formatting, and converting International Bank Account Numbers (IBANs) and Basic Bank Account Numbers (BBANs). It supports 110+ countries and territories according to ISO 13616 standard with zero dependencies.
 
 ## Essential Commands
 
@@ -15,8 +15,8 @@ bun install                    # Install dependencies
 
 # Development
 bun run ts                     # TypeScript type checking
-bun run lint                   # ESLint linting
-bun run lint:fix              # ESLint with auto-fix
+bun run lint                   # Biome lint + format check (biome check)
+bun run lint:fix              # Biome with auto-fix (biome check --write)
 bun test                      # Run tests
 bun test --coverage           # Run tests with coverage
 
@@ -27,17 +27,16 @@ bun run build                 # Build package using zshy bundler
 ### Required Before Task Completion
 Always run these commands in order before considering any task complete:
 1. `bun run ts` - Must pass without TypeScript errors
-2. `bun run lint` - Must pass ESLint checks
+2. `bun run lint` - Must pass Biome checks
 3. `bun test` - All tests must pass
 4. `bun run build` - Must build successfully
 
 ## Tech Stack & Tools
 
-- **Runtime**: Bun (>= 1.2.17) - package manager and test runner
+- **Runtime**: Bun (>= 1.2.17) - script and test runner. `package.json` declares `packageManager: pnpm@10.33.0` and the lockfile is `pnpm-lock.yaml`; CI (`.github/workflows/check.yml`) and the git hooks run `bun install` / `bun run ...`
 - **Language**: TypeScript 5+ with strict mode enabled
 - **Build**: zshy - custom bundler (dual ESM/CJS output)
-- **Linting**: ESLint with @nivalis/eslint-config
-- **Formatting**: Prettier with @nivalis/prettier-config
+- **Linting & Formatting**: Biome (`biome.json` extends `@nivalis/biome-config`)
 - **Git Hooks**: Lefthook manages pre-commit linting and commit message validation
 - **Testing**: Bun's built-in test runner with comprehensive IBAN validation tests
 
@@ -48,7 +47,7 @@ Always run these commands in order before considering any task complete:
 src/
 ├── index.ts          # Main API exports - all public functions
 ├── specification.ts  # Core validation logic & ISO 7064 Mod 97-10 algorithm
-├── countries.ts      # IBAN specifications for 70+ countries
+├── countries.ts      # IBAN specifications for 110+ countries and territories
 ├── utils.ts          # Utility functions and regex patterns
 └── index.spec.ts     # Comprehensive test suite
 ```
@@ -61,11 +60,15 @@ src/
 
 ### Main API Functions
 - `isValid(iban)` - Validates IBAN according to ISO 13616
+- `validate(iban)` - Validates without throwing; returns `{ ok: true }` or `{ ok: false, error }` with a `ValidationError` code
+- `describe(iban)` - Returns the country, electronic IBAN/BBAN and parsed BBAN blocks
 - `electronicFormat(iban)` - Normalizes IBAN to electronic format
 - `printFormat(iban, separator?)` - Formats IBAN for display
 - `toBBAN(iban, separator?)` - Converts IBAN to BBAN
 - `fromBBAN(countryCode, bban)` - Generates IBAN from BBAN
 - `isValidBBAN(countryCode, bban)` - Validates country-specific BBAN
+- `getCountry(countryCode)` - Returns the `Specification` of one country (throws for unknown codes)
+- `availableCountries()` - Returns the frozen map of all country specifications
 
 ## Code Style & Conventions
 
@@ -89,7 +92,7 @@ src/
 ## Development Notes
 
 ### Git Workflow
-- Pre-commit hooks automatically run ESLint on staged files
+- Pre-commit hooks (Lefthook) run `biome check --write` on staged files and `bun run ts`
 - Commit messages validated using commitlint (conventional commits)
 - CI pipeline runs full check suite on all pushes/PRs
 

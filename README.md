@@ -8,7 +8,7 @@ A modern, lightweight TypeScript library for validating, formatting, and convert
 ## Features
 
 - ✅ **Comprehensive IBAN validation** - Validates IBANs according to ISO 13616 standard
-- 🌍 **Wide country support** - Supports 70+ countries and territories
+- 🌍 **Wide country support** - Supports 110+ countries and territories
 - 🔄 **IBAN ↔ BBAN conversion** - Convert between IBAN and country-specific BBAN formats
 - 📝 **Flexible formatting** - Format IBANs for display or electronic processing
 - 🎯 **TypeScript native** - Built with TypeScript for excellent type safety
@@ -80,9 +80,11 @@ const failed = validate('ZZ68539007547034');
 
 Possible `error` codes are:
 
-- `unknown_country` – the IBAN prefix is not part of the ISO registry supported by the library
-- `bad_length` – the IBAN is too short/long or has an invalid BBAN structure for its country
-- `mod97_failure` – the checksum (ISO 7064 Mod 97-10) does not evaluate to 1
+- `invalid_input` – the input is not a string
+- `bad_length` – the input is shorter than 15 or longer than 34 alphanumeric characters, or the BBAN length does not match the country specification
+- `bad_format` – the length is correct but characters violate the country's BBAN block structure, or the check digits are not two digits
+- `unknown_country` – the country code is not a known IBAN country
+- `mod97_failure` – the structure is valid but the check digits are 00, 01 or 99, or fail the ISO 7064 Mod 97-10 check
 
 ### `describe(iban: string): DescribeResult`
 
@@ -109,7 +111,7 @@ const { country, blocks } = describe('BE68 5390 0754 7034');
 
 ### `electronicFormat(iban: string): string`
 
-Converts an IBAN to electronic format (removes spaces and converts to uppercase).
+Converts an IBAN to electronic format (strips every non-alphanumeric character and converts to uppercase). Throws if the result is shorter than 15 or longer than 34 characters.
 
 ```typescript
 import { electronicFormat } from '@nivalis/iban';
@@ -120,7 +122,7 @@ electronicFormat('BE68539007547034'); // 'BE68539007547034'
 
 ### `printFormat(iban: string, separator?: string): string`
 
-Formats an IBAN for display with optional custom separator (defaults to space).
+Formats an IBAN for display with optional custom separator (defaults to space). Throws if the IBAN is shorter than 15 or longer than 34 alphanumeric characters.
 
 ```typescript
 import { printFormat } from '@nivalis/iban';
@@ -140,7 +142,7 @@ toBBAN('BE68539007547034'); // '539 0075470 34'
 toBBAN('BE68539007547034', '-'); // '539-0075470-34'
 ```
 
-### `fromBBAN(countryCode: string, bban: string): string`
+### `fromBBAN(countryCode: CountryCodeInput, bban: string): string`
 
 Generates an IBAN from a country code and BBAN.
 
@@ -151,7 +153,7 @@ fromBBAN('BE', '539007547034'); // 'BE68539007547034'
 fromBBAN('BE', '539-0075470-34'); // 'BE68539007547034' (ignores formatting)
 ```
 
-### `isValidBBAN(countryCode: string, bban: string): boolean`
+### `isValidBBAN(countryCode: CountryCodeInput, bban: string): boolean`
 
 Validates a BBAN for a specific country.
 
@@ -163,9 +165,9 @@ isValidBBAN('BE', '539-0075470-34'); // true (ignores formatting)
 isValidBBAN('BE', '1539007547034'); // false (invalid length)
 ```
 
-### `availableCountries(): { [key: string]: Specification }`
+### `availableCountries(): Readonly<Record<CountryCode, Specification>>`
 
-Returns all supported country specifications.
+Returns all supported country specifications, keyed by country code. The returned object is frozen.
 
 ```typescript
 import { availableCountries } from '@nivalis/iban';
@@ -173,6 +175,19 @@ import { availableCountries } from '@nivalis/iban';
 const countries = availableCountries();
 console.log(Object.keys(countries)); // ['AD', 'AE', 'AL', 'AT', ...]
 console.log(countries['BE'].example); // 'BE68539007547034'
+```
+
+### `getCountry(countryCode: CountryCodeInput): Specification`
+
+Returns the IBAN specification of one country. The code is trimmed and uppercased first; unknown codes throw `No country with code XX`.
+
+```typescript
+import { getCountry } from '@nivalis/iban';
+
+const belgium = getCountry('be');
+belgium.countryCode; // 'BE'
+belgium.example; // 'BE68539007547034'
+belgium.isValidBBAN('539007547034'); // true
 ```
 
 ## Input Sanitization
@@ -204,7 +219,7 @@ Keep in mind the consequences:
 
 ## Supported Countries
 
-The library supports IBAN validation for 70+ countries and territories:
+The library supports IBAN validation for 110+ countries and territories:
 
 | Country | Code | Example IBAN |
 |---------|------|--------------|
@@ -219,7 +234,9 @@ The library supports IBAN validation for 70+ countries and territories:
 <details>
 <summary>View all supported countries</summary>
 
-Andorra (AD), United Arab Emirates (AE), Albania (AL), Austria (AT), Azerbaijan (AZ), Bosnia and Herzegovina (BA), Belgium (BE), Bulgaria (BG), Bahrain (BH), Brazil (BR), Belarus (BY), Switzerland (CH), Costa Rica (CR), Cyprus (CY), Czech Republic (CZ), Germany (DE), Denmark (DK), Dominican Republic (DO), Estonia (EE), Egypt (EG), Spain (ES), Finland (FI), Faroe Islands (FO), France (FR), United Kingdom (GB), Georgia (GE), Gibraltar (GI), Greenland (GL), Greece (GR), Guatemala (GT), Croatia (HR), Hungary (HU), Ireland (IE), Israel (IL), Iceland (IS), Italy (IT), Iraq (IQ), Jordan (JO), Kuwait (KW), Kazakhstan (KZ), Lebanon (LB), Saint Lucia (LC), Liechtenstein (LI), Lithuania (LT), Luxembourg (LU), Monaco (MC), Moldova (MD), Montenegro (ME), North Macedonia (MK), Mauritania (MR), Malta (MT), Mauritius (MU), Netherlands (NL), Norway (NO), Pakistan (PK), Poland (PL), Palestine (PS), Portugal (PT), Qatar (QA), Romania (RO), Serbia (RS), Saudi Arabia (SA), Seychelles (SC), Sweden (SE), Slovenia (SI), Slovakia (SK), San Marino (SM), São Tomé and Príncipe (ST), El Salvador (SV), Timor-Leste (TL), Tunisia (TN), Turkey (TR), Ukraine (UA), Vatican City (VA).
+Andorra (AD), United Arab Emirates (AE), Albania (AL), Angola (AO), Austria (AT), Azerbaijan (AZ), Bosnia and Herzegovina (BA), Belgium (BE), Burkina Faso (BF), Bulgaria (BG), Bahrain (BH), Burundi (BI), Benin (BJ), Saint Barthélemy (BL), Brazil (BR), Belarus (BY), Switzerland (CH), Côte d'Ivoire (CI), Cameroon (CM), Costa Rica (CR), Cabo Verde (CV), Cyprus (CY), Czech Republic (CZ), Germany (DE), Djibouti (DJ), Denmark (DK), Dominican Republic (DO), Algeria (DZ), Estonia (EE), Egypt (EG), Spain (ES), Finland (FI), Falkland Islands (FK), Faroe Islands (FO), France (FR), United Kingdom (GB), Georgia (GE), French Guiana (GF), Gibraltar (GI), Greenland (GL), Guadeloupe (GP), Greece (GR), Guatemala (GT), Honduras (HN), Croatia (HR), Hungary (HU), Ireland (IE), Israel (IL), Iraq (IQ), Iran (IR), Iceland (IS), Italy (IT), Jordan (JO), Kuwait (KW), Kazakhstan (KZ), Lebanon (LB), Saint Lucia (LC), Liechtenstein (LI), Lithuania (LT), Luxembourg (LU), Libya (LY), Monaco (MC), Moldova (MD), Montenegro (ME), Saint Martin (MF), Madagascar (MG), North Macedonia (MK), Mali (ML), Mongolia (MN), Martinique (MQ), Mauritania (MR), Malta (MT), Mauritius (MU), Mozambique (MZ), New Caledonia (NC), Nicaragua (NI), Netherlands (NL), Norway (NO), Oman (OM), French Polynesia (PF), Pakistan (PK), Poland (PL), Saint Pierre and Miquelon (PM), Palestine (PS), Portugal (PT), Qatar (QA), Réunion (RE), Romania (RO), Serbia (RS), Russia (RU), Saudi Arabia (SA), Seychelles (SC), Sudan (SD), Sweden (SE), Slovenia (SI), Slovakia (SK), San Marino (SM), Senegal (SN), Somalia (SO), São Tomé and Príncipe (ST), El Salvador (SV), French Southern Territories (TF), Timor-Leste (TL), Tunisia (TN), Turkey (TR), Ukraine (UA), Vatican City (VA), British Virgin Islands (VG), Wallis and Futuna (WF), Kosovo (XK), Yemen (YE), Mayotte (YT).
+
+This includes 12 countries whose IBAN format is not in the SWIFT IBAN registry (AO, BF, BJ, CI, CM, CV, DZ, IR, MG, ML, MZ, SN) and 12 French overseas territories that use the French structure (BL, GF, GP, MF, MQ, NC, PF, PM, RE, TF, WF, YT).
 
 </details>
 
@@ -317,15 +334,26 @@ try {
 This library is written in TypeScript and provides full type definitions:
 
 ```typescript
-import type { Specification } from '@nivalis/iban';
-import { availableCountries, isValid } from '@nivalis/iban';
+import type {
+  BbanBlockDescription,
+  CountryCode,
+  Specification,
+  ValidationResult,
+} from '@nivalis/iban';
+import { availableCountries, describe, getCountry, validate } from '@nivalis/iban';
 
-// Get type-safe country specifications
-const countries: { [key: string]: Specification } = availableCountries();
+// Country specifications
+const countries: Readonly<Record<CountryCode, Specification>> = availableCountries();
+const belgium: Specification = getCountry('BE');
 
-// Type-safe validation
-const isValidIban: boolean = isValid('BE68539007547034');
+// Structured validation result
+const result: ValidationResult = validate('BE68539007547034');
+
+// BBAN block metadata
+const blocks: BbanBlockDescription[] = describe('BE68539007547034').blocks;
 ```
+
+Exported types: `CountryCode`, `CountryCodeInput`, `ValidationError`, `ValidationResult`, `DescribeResult`, `Specification`, `BbanDescription`, `BbanBlockDescription`, `StructureBlockMetadata`, `StructurePattern`. `Specification` is exported as a type only.
 
 ## Development
 
