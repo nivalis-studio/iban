@@ -224,7 +224,10 @@ export const printFormat = (iban: string, separator = ' '): string => {
     throw new Error('IBAN must be a string');
   }
 
-  return electronicFormat(iban).replaceAll(EVERY_FOUR_CHARS, `$1${separator}`);
+  return electronicFormat(iban).replaceAll(
+    EVERY_FOUR_CHARS,
+    chunk => `${chunk}${separator}`,
+  );
 };
 
 export const availableCountries = (): Readonly<

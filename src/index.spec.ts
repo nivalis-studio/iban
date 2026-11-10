@@ -290,6 +290,26 @@ describe('IBAN', () => {
         'LC07 HEMM 0001 0001 0012 0012 0001 3015',
       );
     });
+
+    it('should use a custom separator', () => {
+      expect(printFormat('BE68539007547034', '-')).toBe('BE68-5390-0754-7034');
+    });
+
+    it('should insert separators containing $ literally', () => {
+      expect(printFormat('BE68539007547034', '$1')).toBe(
+        'BE68$15390$10754$17034',
+      );
+      expect(printFormat('BE68539007547034', '$&')).toBe(
+        'BE68$&5390$&0754$&7034',
+      );
+      expect(printFormat('BE68539007547034', '$$')).toBe(
+        'BE68$$5390$$0754$$7034',
+      );
+    });
+
+    it('should support an empty separator', () => {
+      expect(printFormat('BE68539007547034', '')).toBe('BE68539007547034');
+    });
   });
 
   describe('.toBBAN', () => {
