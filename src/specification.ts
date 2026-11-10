@@ -1,4 +1,4 @@
-import { A_CODE_POINT_AT } from './utils';
+import { A_CODE_POINT_AT, TWO_DIGITS } from './utils';
 
 const PATTERN_FORMATS = {
   A: '0-9A-Za-z',
@@ -133,6 +133,24 @@ const iso13616Prepare = (iban: string): string => {
 };
 
 /**
+ * Check that the IBAN check digits (characters 3-4) are two digits between 02 and 98,
+ * the only values ISO 13616 generation (98 - remainder) can produce.
+ * @param {string} iban the IBAN
+ * @returns {boolean} true if the check digits are in range, false otherwise
+ */
+const hasValidCheckDigits = (iban: string): boolean => {
+  const checkDigits = iban.slice(2, 4);
+
+  if (!TWO_DIGITS.test(checkDigits)) {
+    return false;
+  }
+
+  const value = Number.parseInt(checkDigits, 10);
+
+  return value >= 2 && value <= 98;
+};
+
+/**
  * Create a new Specification for a valid IBAN number.
  * @param countryCode the code of the country
  * @param length the length of the IBAN
@@ -181,6 +199,7 @@ export class Specification {
 
   /**
    * Check if the passed iban is valid according to this specification.
+   * Check digits must be numeric and between 02 and 98.
    * @param {string} iban the iban to validate
    * @returns {boolean} true if valid, false otherwise
    */
@@ -188,6 +207,7 @@ export class Specification {
     return (
       this.#length === iban.length &&
       this.#countryCode === iban.slice(0, 2) &&
+      hasValidCheckDigits(iban) &&
       this.regex().test(iban.slice(4)) &&
       iso7064Mod9710(iso13616Prepare(iban)) === 1
     );

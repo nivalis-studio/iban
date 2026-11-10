@@ -1,5 +1,10 @@
 import { COUNTRIES } from './countries';
-import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
+import {
+  EVERY_FOUR_CHARS,
+  isString,
+  TWO_DIGITS,
+  validateAndFormat,
+} from './utils';
 import type { CountryCode, CountryCodeInput } from './countries';
 import type { BbanDescription, Specification } from './specification';
 
@@ -57,9 +62,9 @@ export const electronicFormat = (iban: string): string => {
  * @returns {ValidationResult} the validation status and optional error code:
  * - `invalid_input`: the input is not a string
  * - `bad_length`: the input is too short, too long, or the BBAN length does not match the country specification
- * - `bad_format`: the length is correct but characters violate the country's BBAN block structure
+ * - `bad_format`: the length is correct but characters violate the country's BBAN block structure, or the check digits are not two digits
  * - `unknown_country`: the country code is not a known IBAN country
- * - `mod97_failure`: the structure is valid but the check digits fail the ISO 7064 Mod 97-10 check
+ * - `mod97_failure`: the structure is valid but the check digits are 00, 01 or 99, or fail the ISO 7064 Mod 97-10 check
  */
 export const validate = (iban: string): ValidationResult => {
   if (!isString(iban)) {
@@ -92,6 +97,10 @@ export const validate = (iban: string): ValidationResult => {
     return { ok: false, error: 'bad_format' };
   }
 
+  if (!TWO_DIGITS.test(ibanFormatted.slice(2, 4))) {
+    return { ok: false, error: 'bad_format' };
+  }
+
   if (!countryStructure.isValid(ibanFormatted)) {
     return { ok: false, error: 'mod97_failure' };
   }
@@ -103,6 +112,7 @@ export const validate = (iban: string): ValidationResult => {
  * Check if an IBAN is valid. Does not throw an error if the IBAN is invalid.
  * Note: non-alphanumeric characters are stripped from the input before
  * validation, so print-formatted IBANs (e.g. 'BE68 5390 0754 7034') are valid.
+ * Check digits (characters 3-4) must be numeric and between 02 and 98.
  * @param {string} iban the IBAN to validate.
  * @returns {boolean} true if the passed IBAN is valid, false otherwise
  */

@@ -66,6 +66,8 @@ isValid('invalid'); // false
 
 Runs the same validation as `isValid` but returns structured error information instead of throwing exceptions.
 
+Check digits (characters 3–4) must be numeric and between `02` and `98`: non-digits yield `bad_format`, while `00`, `01` and `99` yield `mod97_failure`.
+
 ```typescript
 import { validate } from '@nivalis/iban';
 

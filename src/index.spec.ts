@@ -123,6 +123,18 @@ describe('IBAN', () => {
     it('should return false for the old 16-character Burundian format', () => {
       expect(isValid('BI41123456789012')).toBe(false);
     });
+
+    it('should return false for check digits outside 02-98 or non-numeric', () => {
+      // 00, 99 and 01 are congruent to 97, 02 and 98 mod 97, so mod 97-10 alone accepts them
+      expect(isValid('BE00000000000002')).toBe(false);
+      expect(isValid('BE99000000000063')).toBe(false);
+      expect(isValid('BE01000000000081')).toBe(false);
+      // letters in the check-digit slot that happen to satisfy mod 97-10
+      expect(isValid('BEAA000000000041')).toBe(false);
+      expect(isValid('BEAB000000000035')).toBe(false);
+      // canonical form of the first input stays valid
+      expect(isValid('BE97000000000002')).toBe(true);
+    });
   });
 
   describe('.describe', () => {
@@ -193,6 +205,20 @@ describe('IBAN', () => {
     it('should return invalid_input when input is not a string', () => {
       // @ts-expect-error test the case of an invalid param type
       expect(validate(123)).toEqual({ ok: false, error: 'invalid_input' });
+    });
+
+    it('should classify check digits 00, 01 or 99 as mod97_failure', () => {
+      expect(validate('BE00000000000002')).toEqual({
+        ok: false,
+        error: 'mod97_failure',
+      });
+    });
+
+    it('should classify non-numeric check digits as bad_format', () => {
+      expect(validate('BEAA000000000041')).toEqual({
+        ok: false,
+        error: 'bad_format',
+      });
     });
   });
 
@@ -274,6 +300,10 @@ describe('IBAN', () => {
       expect(() => toBBAN('ZZ68539007547034')).toThrow(
         'No country with code ZZ',
       );
+    });
+
+    it('should throw for check digits outside 02-98', () => {
+      expect(() => toBBAN('BE00000000000002')).toThrow('Invalid IBAN');
     });
   });
 
