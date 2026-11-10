@@ -86,7 +86,7 @@ Possible `error` codes are:
 
 ### `describe(iban: string): DescribeResult`
 
-Exposes the parsed BBAN blocks for a given IBAN so you can display the bank/branch/account slices without reimplementing the ISO structure tables.
+Exposes the parsed BBAN blocks for a given IBAN so you can display the bank/branch/account slices without reimplementing the ISO structure tables. Throws an `Invalid IBAN` error if the IBAN is not valid (including wrong check digits), and `No country with code XX` for unknown countries.
 
 The returned object contains:
 

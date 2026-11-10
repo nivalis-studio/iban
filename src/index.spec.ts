@@ -156,6 +156,20 @@ describe('IBAN', () => {
         { pattern: 'F', length: 2, offset: 10, index: 2, value: '34' },
       ]);
     });
+
+    it('should throw an error for an IBAN with invalid check digits', () => {
+      expect(() => describeIban('BE99539007547034')).toThrow('Invalid IBAN');
+    });
+
+    it('should throw an error for an unknown country code', () => {
+      expect(() => describeIban('ZZ68539007547034')).toThrow(
+        'No country with code ZZ',
+      );
+    });
+
+    it('should throw an error for an IBAN with the wrong length', () => {
+      expect(() => describeIban('BE6853900754703412')).toThrow('Invalid IBAN');
+    });
   });
 
   describe('.validate', () => {

@@ -126,6 +126,8 @@ export interface DescribeResult extends BbanDescription {
 
 /**
  * Provide the parsed BBAN blocks and regex groups for a given IBAN.
+ * Throws an error if the IBAN is not valid, including when its check digits
+ * fail the ISO 7064 Mod 97-10 check.
  * @param {string} iban the IBAN to describe
  * @returns {DescribeResult} metadata describing each BBAN block
  */
@@ -137,6 +139,11 @@ export const describe = (iban: string): DescribeResult => {
   const ibanFormatted = electronicFormat(iban);
   const country = toCountryCode(ibanFormatted.slice(0, 2));
   const specification = COUNTRIES[country];
+
+  if (!specification.isValid(ibanFormatted)) {
+    throw new Error('Invalid IBAN');
+  }
+
   const bban = ibanFormatted.slice(4);
   const { blocks, groups } = specification.describeBBAN(bban);
 
