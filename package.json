@@ -10,7 +10,7 @@
 	},
 	"homepage": "https://github.com/nivalis-studio/iban#readme",
 	"repository": {
-		"url": "git+https://github.com/nivalis-studio/nivalis-iban.git"
+		"url": "git+https://github.com/nivalis-studio/iban.git"
 	},
 	"bugs": {
 		"url": "https://github.com/nivalis-studio/iban/issues"
@@ -24,9 +24,6 @@
 		"prepack": "zshy",
 		"prepare": "lefthook install",
 		"ts": "tsc --noEmit --incremental"
-	},
-	"peerDependencies": {
-		"typescript": "^5"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.10",
