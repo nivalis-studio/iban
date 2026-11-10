@@ -339,6 +339,15 @@ describe('IBAN', () => {
     it('should throw for check digits outside 02-98', () => {
       expect(() => toBBAN('BE00000000000002')).toThrow('Invalid IBAN');
     });
+
+    it('should split Ukrainian and Jordanian BBANs into registry blocks', () => {
+      expect(toBBAN('UA511234567890123456789012345', '-')).toBe(
+        '123456-7890123456789012345',
+      );
+      expect(toBBAN('JO15AAAA1234567890123456789012', '-')).toBe(
+        'AAAA-1234-567890123456789012',
+      );
+    });
   });
 
   describe('.fromBBAN', () => {
@@ -390,6 +399,33 @@ describe('IBAN', () => {
         expect(fromBBAN(countryCode, bban)).toBe(country.example);
       }
     });
+
+    it('should generate valid IBANs for registry-conformant BBANs containing letters', () => {
+      const cases = [
+        ['UA', '322313000002600723356600A', 'UA88322313000002600723356600A'],
+        ['JO', 'CBJO00100000000001310003AB', 'JO15CBJO00100000000001310003AB'],
+        [
+          'LC',
+          'HEMM00010001001200120002301A',
+          'LC57HEMM00010001001200120002301A',
+        ],
+        ['DO', 'B4GR00000001212453611324', 'DO07B4GR00000001212453611324'],
+        ['MD', '2G000225100013104168', 'MD782G000225100013104168'],
+      ] as const;
+
+      for (const [countryCode, bban, expected] of cases) {
+        const iban = fromBBAN(countryCode, bban);
+
+        expect(iban).toBe(expected);
+        expect(isValid(iban)).toBe(true);
+      }
+    });
+
+    it('should reject a Jordanian BBAN with a digit in the bank code', () => {
+      expect(() => fromBBAN('JO', '1BJO0010000000000131000302')).toThrowError(
+        INVALID_BBAN_REGEX,
+      );
+    });
   });
 
   describe('.isValidBBAN', () => {
@@ -439,6 +475,18 @@ describe('IBAN', () => {
 
     it('should return false for a BBAN that is too long', () => {
       expect(isValidBBAN('BE', '5'.repeat(40))).toBe(false);
+    });
+
+    it('should accept registry-conformant BBANs with letters in newly permitted positions', () => {
+      expect(isValidBBAN('UA', '322313000002600723356600A')).toBe(true);
+      expect(isValidBBAN('JO', 'CBJO00100000000001310003AB')).toBe(true);
+      expect(isValidBBAN('LC', 'HEMM00010001001200120002301A')).toBe(true);
+      expect(isValidBBAN('DO', 'B4GR00000001212453611324')).toBe(true);
+      expect(isValidBBAN('MD', '2G000225100013104168')).toBe(true);
+    });
+
+    it('should reject a Jordanian BBAN with a digit in the bank code', () => {
+      expect(isValidBBAN('JO', '1BJO0010000000000131000302')).toBe(false);
     });
   });
 
