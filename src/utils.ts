@@ -1,5 +1,6 @@
 export const NON_ALPHANUM = /[^\da-z]/gi;
 export const EVERY_FOUR_CHARS = /(.{4})(?!$)/g;
+export const TWO_DIGITS = /^\d{2}$/;
 export const A_CODE_POINT_AT = 65; // 'A'.codePointAt(0);
 
 // Maximum IBAN length defined by ISO 13616 (34 characters)
