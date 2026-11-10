@@ -9,6 +9,13 @@ import type { CountryCode, CountryCodeInput } from './countries';
 import type { BbanDescription, Specification } from './specification';
 
 export type { CountryCode, CountryCodeInput } from './countries';
+export type {
+  BbanBlockDescription,
+  BbanDescription,
+  Specification,
+  StructureBlockMetadata,
+  StructurePattern,
+} from './specification';
 
 const isCountryCode = (countryCode: string): countryCode is CountryCode =>
   Object.hasOwn(COUNTRIES, countryCode);
@@ -23,6 +30,13 @@ const toCountryCode = (countryCode: string): CountryCode => {
   return normalizedCountryCode;
 };
 
+/**
+ * Get the IBAN specification of a country.
+ * The country code is trimmed and uppercased before lookup.
+ * Throws an error if no specification exists for the country code.
+ * @param {CountryCodeInput} countryCode the ISO 3166-1 alpha-2 country code, e.g. 'BE'
+ * @returns {Specification} the IBAN specification of the country
+ */
 export function getCountry(countryCode: CountryCodeInput): Specification {
   return COUNTRIES[toCountryCode(countryCode)];
 }
@@ -230,6 +244,11 @@ export const printFormat = (iban: string, separator = ' '): string => {
   );
 };
 
+/**
+ * Get the specifications of every supported country, keyed by country code.
+ * The returned object is frozen.
+ * @returns {Readonly<Record<CountryCode, Specification>>} all supported country specifications
+ */
 export const availableCountries = (): Readonly<
   Record<CountryCode, Specification>
 > => COUNTRIES;
