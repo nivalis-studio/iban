@@ -16,17 +16,26 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # .node-version (v24.x) bundles npm >= 11.5.1, required for trusted publishing
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version-file: .node-version
           registry-url: https://registry.npmjs.org
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
 
       - uses: pnpm/action-setup@v4
       - run: pnpm install --frozen-lockfile
 
-      # Ensure npm 11.5.1 or later is installed
-      - name: Ensure npm supports trusted publishing
-        run: npm install -g npm@latest
+      - name: Check typescript
+        run: pnpm run ts
+
+      - name: Check linter
+        run: pnpm run lint
+
+      - name: Check tests
+        run: bun test
 
       - name: Publish to npm
         run: npm publish --registry=https://registry.npmjs.org
