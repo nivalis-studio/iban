@@ -2,7 +2,7 @@
 	"name": "@nivalis/iban",
 	"description": "A simple library to validate IBAN numbers",
 	"type": "module",
-	"version": "0.3.7",
+	"version": "0.3.8",
 	"license": "MIT",
 	"packageManager": "pnpm@10.33.0",
 	"publishConfig": {
