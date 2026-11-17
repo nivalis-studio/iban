@@ -54,6 +54,10 @@ describe('IBAN', () => {
       expect(isValid('MD75EX0900002374642125EU')).toBe(true);
     });
 
+    it('should return true for a valid Latvian IBAN', () => {
+      expect(isValid('LV80BANK0000435195001')).toBe(true);
+    });
+
     it('should return true for a valid Saint-Lucia IBAN', () => {
       expect(isValid('LC55HEMM000100010012001200023015')).toBe(true);
     });
