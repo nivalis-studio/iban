@@ -137,6 +137,7 @@ const COUNTRY_DEFINITIONS = {
   'LI': new Specification('LI', 21, 'F05A12', 'LI21088100002324013AA'),
   'LT': new Specification('LT', 20, 'F05F11', 'LT121000011101001000'),
   'LU': new Specification('LU', 20, 'F03A13', 'LU280019400644750000'),
+  'LV': new Specification('LV', 21, 'U04A13', 'LV80BANK0000435195001'),
   'LY': new Specification('LY', 25, 'F03F03F15', 'LY83002048000020100120361'),
 
   'MC': new Specification(
